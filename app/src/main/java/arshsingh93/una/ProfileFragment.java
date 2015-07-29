@@ -14,14 +14,7 @@ import android.widget.TextView;
 
 import com.parse.ParseUser;
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link ProfileFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link ProfileFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+
 public class ProfileFragment extends Fragment {
 
 
@@ -29,54 +22,22 @@ public class ProfileFragment extends Fragment {
     public static final String SHOW_COLOR_OPTIONS = "show color options";
 
     Button settingButton;
+    Button groupButton;
+    Button leadButton;
+    Button blogButton;
+    Button tbdButton;
+
     TextView username;
     private OnFragmentInteractionListener mListener;
 
 
-
-
-
-
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-    // TODO: Rename and change types of parameters..............or delete them
-    private String mParam1;
-    private String mParam2;
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment ProfileFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static ProfileFragment newInstance(String param1, String param2) {
-        ProfileFragment fragment = new ProfileFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
     public ProfileFragment() {
         // Required empty public constructor
     }
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
     }
-
-
-
-
-
 
 
     @Override
@@ -86,9 +47,18 @@ public class ProfileFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_profile, container, false);
 
         username = (TextView) v.findViewById(R.id.profileUsernameText);
-
         ParseUser currentUser = ParseUser.getCurrentUser();
         username.setText( (String) currentUser.get("origName")); //just added this.
+        username.setTextColor(TheUtils.getProperColor());
+
+        groupButton = (Button) v.findViewById(R.id.profileGroupButton);
+        groupButton.setBackgroundColor(TheUtils.getProperColor());
+        leadButton = (Button) v.findViewById(R.id.profileLeadButton);
+        leadButton.setBackgroundColor(TheUtils.getProperColor());
+        blogButton = (Button) v.findViewById(R.id.profileBlogButton);
+        blogButton.setBackgroundColor(TheUtils.getProperColor());
+        tbdButton = (Button) v.findViewById(R.id.button4);
+        tbdButton.setBackgroundColor(TheUtils.getProperColor());
 
         settingButton = (Button) v.findViewById(R.id.profileSettingButton);
         settingButton.setOnClickListener(new View.OnClickListener() {
@@ -102,6 +72,7 @@ public class ProfileFragment extends Fragment {
 
         return v;
     }
+
 
 
 

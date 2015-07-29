@@ -39,6 +39,20 @@ public class TheUtils {
         }
     }
 
+    public static int getProperColor() {
+            switch (sTheme) {
+                case THEME_GREEN:
+                    return 0xff56c367;
+                case THEME_BLUE:
+                    return 0xff00aac3;
+                case THEME_RED:
+                    return 0xffff4444; //just right
+                    // return 0xffff0000; too red
+                   // return 0xffc35b4e; too brown
+            }
+        return 0x56c367;
+    }
+
 
 
 
