@@ -1,7 +1,11 @@
 package arshsingh93.una;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
+import android.util.Log;
 
 /**
  * Created by Student on 7/29/2015.
@@ -12,12 +16,17 @@ public class TheUtils {
     public final static int THEME_BLUE = 1;
     public final static int THEME_RED = 2;
 
+    private static SharedPreferences sharedPreferences;
+
     /**
      * Set the theme of the Activity, and restart it by creating a new Activity of the same type.
      */
     public static void changeToTheme(Activity activity, int theme) {
         sTheme = theme;
+        initializePref(activity);
+        saveColorTheme();
         activity.finish();
+        activity.getApplicationContext();
         activity.startActivity(new Intent(activity, activity.getClass()));
     }
 
@@ -53,11 +62,23 @@ public class TheUtils {
         return 0x56c367;
     }
 
+    private static void initializePref(Activity activity) {
+        if (sharedPreferences == null) {
+            Log.e("TheUtils class", (sharedPreferences == null) + "");
+            sharedPreferences = PreferenceManager.getDefaultSharedPreferences(activity.getApplicationContext());
+            Log.e("TheUtils class again", (sharedPreferences == null) + "");
+        }
+    }
 
+    private static void saveColorTheme() {
+        sharedPreferences.edit().putInt("Theme", sTheme).commit(); //TODO change to .apply rather than .commit
+    }
 
-
-
-
-
+    public static void loadColorTheme(Activity activity) {
+        initializePref(activity);
+        if (sharedPreferences.contains("Theme")) {
+            sTheme = sharedPreferences.getInt("Theme", 0);
+        }
+    }
 
 }

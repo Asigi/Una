@@ -37,6 +37,7 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        TheUtils.loadColorTheme(this);
         TheUtils.onActivityCreateSetTheme(this);
         setContentView(R.layout.activity_main);
 
