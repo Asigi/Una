@@ -5,75 +5,63 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.TextView;
-
-import com.parse.ParseUser;
 
 
-public class ProfileFragment extends Fragment {
+public class BlogDummyFragment extends Fragment {
 
+    public static final String SHOW = "show";
+    public static final String CREATE_BLOG = "Create blog";
 
-    public static final String SHOW = "show"; //TODO delete this once settings button has been moved to options menu.
-    public static final String SHOW_COLOR_OPTIONS = "show color options";
+    Button findBlogButton;
+    Button createBlogButton;
+    Button loadBlogButton;
 
-    //Button settingButton;
-    Button groupButton;
-    Button leadButton;
-    Button blogButton;
-    Button tbdButton;
-
-    TextView username;
     private OnFragmentInteractionListener mListener;
 
+    public BlogDummyFragment() {}
 
-    public ProfileFragment() {
-        // Required empty public constructor
-    }
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
     }
 
-
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(final LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View v = inflater.inflate(R.layout.fragment_profile, container, false);
+        View v = inflater.inflate(R.layout.fragment_blog_dummy, container, false);
 
-        username = (TextView) v.findViewById(R.id.profileUsernameText);
-        ParseUser currentUser = ParseUser.getCurrentUser();
-        username.setText( (String) currentUser.get("origName")); //just added this.
-        username.setTextColor(TheUtils.getProperColor());
+        findBlogButton = (Button) v.findViewById(R.id.blogDummyFindBlogButton);
+        findBlogButton.setBackgroundColor(TheUtils.getProperColor());
+        createBlogButton = (Button) v.findViewById(R.id.blogDummyCreateBlogButton);
+        createBlogButton.setBackgroundColor(TheUtils.getProperColor());
+        loadBlogButton = (Button) v.findViewById(R.id.blogDummyLoadBlogButton);
+        loadBlogButton.setBackgroundColor(TheUtils.getProperColor());
 
-        groupButton = (Button) v.findViewById(R.id.profileGroupButton);
-        groupButton.setBackgroundColor(TheUtils.getProperColor());
-        leadButton = (Button) v.findViewById(R.id.profileLeadButton);
-        leadButton.setBackgroundColor(TheUtils.getProperColor());
-        blogButton = (Button) v.findViewById(R.id.profileBlogButton);
-        blogButton.setBackgroundColor(TheUtils.getProperColor());
-        tbdButton = (Button) v.findViewById(R.id.button4);
-        tbdButton.setBackgroundColor(TheUtils.getProperColor());
 
-        /**
-        settingButton = (Button) v.findViewById(R.id.profileSettingButton);
-        settingButton.setOnClickListener(new View.OnClickListener() {
+        createBlogButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(v.getContext(), NoTabActivity.class);
-                intent.putExtra(SHOW, SHOW_COLOR_OPTIONS);
+                intent.putExtra(SHOW, CREATE_BLOG);
                 startActivity(intent);
             }
         });
-         **/
+
 
         return v;
     }
+
+
+
+
+
+
+
 
 
 
@@ -91,7 +79,6 @@ public class ProfileFragment extends Fragment {
         try {
             mListener = (OnFragmentInteractionListener) activity;
         } catch (ClassCastException e) {
-            Log.e(ProfileFragment.class.getSimpleName(), "EXCEPTION inside onAttach of profile fragment: " + e);
             throw new ClassCastException(activity.toString()
                     + " must implement OnFragmentInteractionListener");
         }

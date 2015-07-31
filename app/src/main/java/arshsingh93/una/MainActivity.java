@@ -25,7 +25,7 @@ import com.parse.ParseAnalytics;
 import com.parse.ParseUser;
 
 public class MainActivity extends AppCompatActivity implements ActionBar.TabListener,
-        ProfileFragment.OnFragmentInteractionListener {
+        ProfileFragment.OnFragmentInteractionListener, BlogDummyFragment.OnFragmentInteractionListener {
 
 
     private static final String TAG = MainActivity.class.getSimpleName();
@@ -174,6 +174,7 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
             Log.e(TAG, "here in sectionsPagerAdapter constructor, before profilefragment construction");
             myMainFragments = new Fragment[3];
             myMainFragments[2] = new ProfileFragment();
+            myMainFragments[1] = new BlogDummyFragment();
         }
 
         @Override
@@ -181,6 +182,9 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
             // getItem is called to instantiate the fragment for the given page.
             // Return a PlaceholderFragment (defined as a static inner class below).
 
+            if (position == 1) {
+                return myMainFragments[1];
+            }
             if (position == 2) {
                 return myMainFragments[2];
             }

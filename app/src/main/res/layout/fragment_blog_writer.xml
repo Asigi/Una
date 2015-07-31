@@ -1,0 +1,68 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent" tools:context="arshsingh93.una.model.BlogWriterFragment"
+    android:background="#ffffff">
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+
+        <EditText
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/blogWriterTitle"
+            android:hint="Blog Title"
+            android:inputType="textMultiLine"
+            android:maxLines="3"
+            android:layout_marginTop="30dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"/>
+
+        <EditText
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/blogWriterBody"
+            android:inputType="textMultiLine"
+            android:ems="10"
+
+            android:layout_below="@+id/blogWriterTitle"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="30dp"
+
+            android:hint="Write the body of your blog here" />
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/blogWriterHoriz"
+            android:layout_below="@+id/blogWriterBody"
+            android:weightSum="2"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginTop="20dp">
+
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Save"
+                android:id="@+id/blogWriterSaveButton"
+                android:layout_weight="1" />
+
+            <Space
+                android:layout_width="20px"
+                android:layout_height="20px" />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Publish"
+                android:id="@+id/blogWriterPublishButton"
+                android:layout_weight="1" />
+        </LinearLayout>
+    </RelativeLayout>
+</ScrollView>

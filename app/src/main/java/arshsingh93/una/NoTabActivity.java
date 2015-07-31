@@ -14,8 +14,10 @@ import android.view.MenuItem;
 import android.view.Window;
 import android.view.WindowManager;
 
+import arshsingh93.una.model.BlogWriterFragment;
 
-public class NoTabActivity extends ActionBarActivity implements colorListFragment.OnFragmentInteractionListener {
+
+public class NoTabActivity extends ActionBarActivity implements colorListFragment.OnFragmentInteractionListener, BlogWriterFragment.OnFragmentInteractionListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +35,8 @@ public class NoTabActivity extends ActionBarActivity implements colorListFragmen
         Intent intent = getIntent();
         if (intent.getStringExtra(ProfileFragment.SHOW).equals(ProfileFragment.SHOW_COLOR_OPTIONS)) {
             fragment = new colorListFragment();
+        } if (intent.getStringExtra(BlogDummyFragment.SHOW).equals(BlogDummyFragment.CREATE_BLOG)) {
+            fragment = new BlogWriterFragment();
         } else {
             fragment = new colorListFragment();
         }
@@ -44,6 +48,11 @@ public class NoTabActivity extends ActionBarActivity implements colorListFragmen
 
     @Override
     public void onFragmentInteraction(String id) {
+
+    }
+
+    @Override
+    public void onFragmentInteraction(Uri uri) {
 
     }
 

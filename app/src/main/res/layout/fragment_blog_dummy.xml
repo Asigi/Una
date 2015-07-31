@@ -1,0 +1,55 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent" tools:context="arshsingh93.una.BlogDummyFragment">
+
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/linearLayout2"
+        android:layout_margin="15dp"
+        >
+
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Find Blogs"
+            android:id="@+id/blogDummyFindBlogButton"
+            android:layout_gravity="center_horizontal" />
+
+        <Space
+            android:layout_width="20px"
+            android:layout_height="20px" />
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:weightSum="1">
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Create Blog"
+                android:id="@+id/blogDummyCreateBlogButton"
+                android:layout_weight=".5" />
+
+            <Space
+                android:layout_width="20px"
+                android:layout_height="20px" />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Load Blog"
+                android:id="@+id/blogDummyLoadBlogButton"
+                android:layout_weight=".5" />
+        </LinearLayout>
+    </LinearLayout>
+
+</RelativeLayout>
