@@ -21,7 +21,7 @@ public class BlogHelper extends SQLiteOpenHelper{
     private static final String CREATE_BLOGS = "CREATE TABLE " + BLOGS_TABLE + " (" +
             BaseColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
             COLUMN_BLOG_BODY + " TEXT, " +
-            COLUMN_BLOG_TITLE + " TEXT";
+            COLUMN_BLOG_TITLE + " TEXT)"; //insert second perenthesis somewhere
 
 
 
