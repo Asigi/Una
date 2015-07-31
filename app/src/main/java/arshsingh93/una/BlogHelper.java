@@ -12,14 +12,17 @@ public class BlogHelper extends SQLiteOpenHelper{
     public static final String DB_NAME = "una.db";
     public static final int DB_VERSION = 1;
 
-    //table functionality
-    public static final String BLOG_TABLE = "BLOG";
-    public static final String COLUMN_BLOG_ASSET = "ASSET";
-    public static final String COLUMN_BLOG_NAME = "NAME";
-    private static String CREATE_BLOGS = "CREATE TABLE " + BLOG_TABLE + " (" +
-            BaseColumns._ID + "  INTEGER PRIMARY KEY AUTOINCREMENT," +
-            COLUMN_BLOG_ASSET + " TEXT," +
-            COLUMN_BLOG_NAME + " TEXT";
+
+    public static final String BLOGS_TABLE = "BLOGS";
+    public static final String COLUMN_BLOG_TITLE = "TITLE";
+    public static final String COLUMN_BLOG_BODY = "BODY";
+
+
+    private static final String CREATE_BLOGS = "CREATE TABLE " + BLOGS_TABLE + " (" +
+            BaseColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
+            COLUMN_BLOG_BODY + " TEXT, " +
+            COLUMN_BLOG_TITLE + " TEXT";
+
 
 
 
