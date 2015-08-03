@@ -1,4 +1,4 @@
-package arshsingh93.una;
+package arshsingh93.una.Unused;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -13,6 +13,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
 import android.widget.TextView;
 
+import arshsingh93.una.R;
 import arshsingh93.una.model.ColorTheme;
 import arshsingh93.una.model.DummyContent;
 

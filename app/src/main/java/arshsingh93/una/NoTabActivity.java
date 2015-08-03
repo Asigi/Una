@@ -2,18 +2,13 @@ package arshsingh93.una;
 
 import android.net.Uri;
 import android.support.v4.app.FragmentManager;
-import android.app.ListFragment;
 import android.content.Intent;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v4.app.FragmentTransaction;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.Window;
-import android.view.WindowManager;
 
+import arshsingh93.una.Unused.colorListFragment;
 import arshsingh93.una.model.BlogWriterFragment;
 
 
