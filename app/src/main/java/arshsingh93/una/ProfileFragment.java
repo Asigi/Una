@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -19,8 +20,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.parse.GetDataCallback;
+import com.parse.ParseException;
+import com.parse.ParseFile;
 import com.parse.ParseUser;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -56,7 +61,6 @@ public class ProfileFragment extends Fragment {
                     }
                     takePhotoIntent.putExtra(MediaStore.EXTRA_OUTPUT, mMediaUri);
                     startActivityForResult(takePhotoIntent, TAKE_PHOTO_REQUEST);
-                    setImage(mMediaUri);
                     break;
                 case 1: //Take Choose Photo
                     Intent choosePhotoIntent = new Intent(Intent.ACTION_GET_CONTENT);
@@ -79,7 +83,7 @@ public class ProfileFragment extends Fragment {
                 //2. Create our subdirectory
                 if (!mediaStorageDir.exists()) {
                     if (!mediaStorageDir.mkdirs()) {
-                        Log.e(this.getClass().getSimpleName(), "Failed to get directory");
+                        Log.e("ProfileFragment", "Failed to get directory");
                     }
                 }
 
@@ -93,11 +97,11 @@ public class ProfileFragment extends Fragment {
                     mediaFile = new File(path + "IMG_" + timeStamp + ".jpg");
                 } //else if video type...but i'm not using videos here so this is good enough.
                 else {
-                    Log.d(this.getClass().getSimpleName(), "file path is null");
+                    Log.d("ProfileFragment", "file path is null");
                     return null;
                 }
 
-                Log.d(this.getClass().getSimpleName(), "File: " + Uri.fromFile(mediaFile));
+                Log.d("ProfileFragment", "File: " + Uri.fromFile(mediaFile));
 
                 //5. Return the files Uri
                 return Uri.fromFile(mediaFile);
@@ -117,13 +121,26 @@ public class ProfileFragment extends Fragment {
     };
 
     private void setImage(Uri theUri) {
+        Log.d("ProfileFragment", "Here in setImage with uri: " + theUri);
         try {
             Bitmap bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), theUri);
+            Log.d("ProfileFragment", "bitmap is: " + bitmap.toString());
             profilePic.setImageBitmap(bitmap);
+
+            //send to parse
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+            byte[] array = stream.toByteArray();
+            ParseFile file = new ParseFile("profilePic.jpeg", array);
+            file.saveInBackground();
+            ParseUser.getCurrentUser().put("profilePic", file);
+            ParseUser.getCurrentUser().saveInBackground(); //is this necessary?
+
+
         } catch (FileNotFoundException e) {
-            Log.e(getClass().getSimpleName(), "Error: " + e);
+            Log.e("ProfileFragment", "Error: " + e);
         } catch (IOException e) {
-            Log.e(getClass().getSimpleName(), "Error: " + e);
+            Log.e("ProfileFragment", "Error: " + e);
         }
     }
 
@@ -151,6 +168,8 @@ public class ProfileFragment extends Fragment {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.d("ProfileFragment", "Here in onActivityResult with requestCode: " + requestCode + " , resultCode: " +
+                resultCode  + " , data: " + data);
         super.onActivityResult(requestCode, resultCode, data);
 
         if (resultCode == getActivity().RESULT_OK) {
@@ -159,11 +178,15 @@ public class ProfileFragment extends Fragment {
                     Toast.makeText(getActivity(), "Sorry, there was an error", Toast.LENGTH_LONG).show();
                 } else {
                     mMediaUri = data.getData();
+                    Log.d("ProfileFragment", "Here in onActivityResult's if if else.");
+                    setImage(mMediaUri);
                 }
             } else {
                 Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
                 mediaScanIntent.setData(mMediaUri);
                 getActivity().sendBroadcast(mediaScanIntent);
+                setImage(mMediaUri);
+                Log.d("ProfileFragment", "Here in onActivityResult's if else.");
             }
         } else if (resultCode != getActivity().RESULT_CANCELED) {
             Toast.makeText(getActivity(), "Sorry, there was an error", Toast.LENGTH_LONG).show();
@@ -190,6 +213,18 @@ public class ProfileFragment extends Fragment {
                 builder.setItems(R.array.camera_choices, mDialogInterface);
                 AlertDialog dialog = builder.create();
                 dialog.show();
+            }
+        });
+        ParseFile picFile = (ParseFile) ParseUser.getCurrentUser().get("profilePic");
+        picFile.getDataInBackground(new GetDataCallback() {
+            @Override
+            public void done(byte[] bytes, ParseException e) {
+                if (e == null) {
+                    Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                    profilePic.setImageBitmap(bitmap);
+                } else {
+                    //unable to load image. //TODO
+                }
             }
         });
 
@@ -236,7 +271,7 @@ public class ProfileFragment extends Fragment {
         try {
             mListener = (OnFragmentInteractionListener) activity;
         } catch (ClassCastException e) {
-            Log.e(ProfileFragment.class.getSimpleName(), "EXCEPTION inside onAttach of profile fragment: " + e);
+            Log.e("ProfileFragment", "EXCEPTION inside onAttach of profile fragment: " + e);
             throw new ClassCastException(activity.toString()
                     + " must implement OnFragmentInteractionListener");
         }
