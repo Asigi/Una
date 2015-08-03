@@ -51,6 +51,10 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="arshsingh93.una.MainActivity" />
         </activity>
+        <activity
+            android:name=".EnterActivity"
+            android:label="Una App" >
+        </activity>
     </application>
 
 </manifest>

@@ -46,7 +46,8 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
         ParseUser currentUser = ParseUser.getCurrentUser();
         if (currentUser == null) {
             Log.e(TAG, "Current user is null so move to login screen");
-            navigateToLogin();
+            //navigateToLogin();
+            navigateToEnter();
         } else {
             Log.i(TAG, currentUser.getUsername());
 
@@ -122,7 +123,8 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_logout) {
             ParseUser.logOut();
-            navigateToLogin();
+           // navigateToLogin();
+            navigateToEnter();
         }
 
         return super.onOptionsItemSelected(item);
@@ -152,6 +154,15 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK); //this prevents you from getting back to the previous page.
         startActivity(intent);
     }
+
+    private void navigateToEnter() {
+        Intent intent = new Intent(this, EnterActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK); //this prevents you from getting back to the previous page.
+        startActivity(intent);
+    }
+
+
 
     @Override
     public void onFragmentInteraction(Uri uri) {

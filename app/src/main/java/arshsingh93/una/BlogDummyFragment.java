@@ -52,6 +52,14 @@ public class BlogDummyFragment extends Fragment {
             }
         });
 
+        loadBlogButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+
+
 
         return v;
     }
