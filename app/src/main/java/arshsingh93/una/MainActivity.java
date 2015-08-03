@@ -149,7 +149,7 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
 
 
     private void navigateToLogin() {
-        Intent intent = new Intent(this, LoginActivity.class);
+        Intent intent = new Intent(this, arshsingh93.una.LoginActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK); //this prevents you from getting back to the previous page.
         startActivity(intent);
