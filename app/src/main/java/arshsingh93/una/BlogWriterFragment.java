@@ -1,4 +1,4 @@
-package arshsingh93.una.model;
+package arshsingh93.una;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -25,6 +25,7 @@ import arshsingh93.una.LoginActivity;
 import arshsingh93.una.MainActivity;
 import arshsingh93.una.R;
 import arshsingh93.una.TheUtils;
+import arshsingh93.una.model.Blog;
 
 
 public class BlogWriterFragment extends Fragment {

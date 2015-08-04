@@ -55,7 +55,11 @@ public class BlogDummyFragment extends Fragment {
         loadBlogButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                    //open a new dialogfragment that holds a list
+                    //when an item in that list is clicked, get the title and body and
+                    //pass them into onContinueBlog() in blogWriterFragment.
+                    //the onContinueBlog() will populate the blog page with the values that
+                    //the user had stored.
             }
         });
 

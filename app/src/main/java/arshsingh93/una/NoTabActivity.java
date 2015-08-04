@@ -9,10 +9,11 @@ import android.support.v4.app.FragmentTransaction;
 import android.os.Bundle;
 
 import arshsingh93.una.Unused.colorListFragment;
-import arshsingh93.una.model.BlogWriterFragment;
 
 
-public class NoTabActivity extends ActionBarActivity implements colorListFragment.OnFragmentInteractionListener, BlogWriterFragment.OnFragmentInteractionListener {
+public class NoTabActivity extends ActionBarActivity implements colorListFragment.OnFragmentInteractionListener,
+        BlogWriterFragment.OnFragmentInteractionListener,
+        BlogListFragment.OnFragmentInteractionListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,13 +29,15 @@ public class NoTabActivity extends ActionBarActivity implements colorListFragmen
         FragmentManager fm = getSupportFragmentManager();
         Fragment fragment;
         Intent intent = getIntent();
-        if (intent.getStringExtra(ProfileFragment.SHOW).equals(ProfileFragment.SHOW_COLOR_OPTIONS)) {
-            fragment = new colorListFragment();
-        } if (intent.getStringExtra(BlogDummyFragment.SHOW).equals(BlogDummyFragment.CREATE_BLOG)) {
+
+        if (intent.getStringExtra(ProfileFragment.SHOW).equals(ProfileFragment.SHOW_MY_BLOGS)) {
+            fragment = new BlogListFragment();
+        } else if (intent.getStringExtra(BlogDummyFragment.SHOW).equals(BlogDummyFragment.CREATE_BLOG)) {
             fragment = new BlogWriterFragment();
         } else {
             fragment = new colorListFragment();
         }
+
         FragmentTransaction fragmentTransaction = fm.beginTransaction();
         fragmentTransaction.add(R.id.non_tab_container, fragment); //changed from .replace
         fragmentTransaction.commit();

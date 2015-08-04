@@ -9,6 +9,7 @@ import com.parse.ParseUser;
  */
 public class Blog {
     public ParseObject blog;
+    public String myID;
 
     public Blog(String theTitle, String theBody, ParseUser theWriter) {
         blog = new ParseObject("Blog");
@@ -21,6 +22,8 @@ public class Blog {
         ParseACL postACL = new ParseACL(ParseUser.getCurrentUser());
         postACL.setPublicReadAccess(true);
         blog.setACL(postACL);
+
+        myID = blog.getObjectId();
     }
 
 

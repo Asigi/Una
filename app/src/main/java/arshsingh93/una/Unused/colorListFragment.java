@@ -14,7 +14,6 @@ import android.widget.ListAdapter;
 import android.widget.TextView;
 
 import arshsingh93.una.R;
-import arshsingh93.una.model.ColorTheme;
 import arshsingh93.una.model.DummyContent;
 
 /**

@@ -36,18 +36,23 @@ import java.util.Locale;
 
 public class ProfileFragment extends Fragment {
 
-
     public static final String SHOW = "show"; //TODO delete this once settings button has been moved to options menu.
     public static final String SHOW_COLOR_OPTIONS = "show color options";
+    public static final String SHOW_MY_BLOGS = "show my blogs";
+
     public static final int TAKE_PHOTO_REQUEST = 0;
     public static final int CHOOSE_PHOTO_REQUEST = 1;
-
     public static final int MEDIA_TYPE_IMAGE = 4;
-
+    //Button settingButton;
+    public Button groupButton;
+    public Button leadButton;
+    public Button blogButton;
+    public Button tbdButton;
+    public ImageView profilePic;
+    public TextView username;
+    private OnFragmentInteractionListener mListener;
     protected Uri mMediaUri;
-
     protected DialogInterface.OnClickListener mDialogInterface = new DialogInterface.OnClickListener() {
-
         @Override
         public void onClick(DialogInterface dialog, int which) {
             switch (which) {
@@ -69,24 +74,20 @@ public class ProfileFragment extends Fragment {
                     break;
             }
         }
-
         private Uri getOutputMediaFileUri(int theMediaType) {
             if (isExternalStorageAvailable()) {
                 //get the Uri
-
                 //1. Get external storage directory
                 String appName = getActivity().getString(R.string.app_name);
                 File mediaStorageDir = new File(
                         Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
                         appName);
-
                 //2. Create our subdirectory
                 if (!mediaStorageDir.exists()) {
                     if (!mediaStorageDir.mkdirs()) {
                         Log.e("ProfileFragment", "Failed to get directory");
                     }
                 }
-
                 //3. Create a file name
                 //4. Create the file
                 File mediaFile;
@@ -100,16 +101,13 @@ public class ProfileFragment extends Fragment {
                     Log.d("ProfileFragment", "file path is null");
                     return null;
                 }
-
                 Log.d("ProfileFragment", "File: " + Uri.fromFile(mediaFile));
-
                 //5. Return the files Uri
                 return Uri.fromFile(mediaFile);
             } else {
                 return null;
             }
         }
-
         private boolean isExternalStorageAvailable() {
             String state = Environment.getExternalStorageState();
             if (state.equals(Environment.MEDIA_MOUNTED)) {
@@ -120,42 +118,6 @@ public class ProfileFragment extends Fragment {
         }
     };
 
-    private void setImage(Uri theUri) {
-        Log.d("ProfileFragment", "Here in setImage with uri: " + theUri);
-        try {
-            Bitmap bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), theUri);
-            Log.d("ProfileFragment", "bitmap is: " + bitmap.toString());
-            profilePic.setImageBitmap(bitmap);
-
-            //send to parse
-            ByteArrayOutputStream stream = new ByteArrayOutputStream();
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
-            byte[] array = stream.toByteArray();
-            ParseFile file = new ParseFile("profilePic.jpeg", array);
-            file.saveInBackground();
-            ParseUser.getCurrentUser().put("profilePic", file);
-            ParseUser.getCurrentUser().saveInBackground(); //is this necessary?
-
-
-        } catch (FileNotFoundException e) {
-            Log.e("ProfileFragment", "Error: " + e);
-        } catch (IOException e) {
-            Log.e("ProfileFragment", "Error: " + e);
-        }
-    }
-
-
-
-    //Button settingButton;
-    Button groupButton;
-    Button leadButton;
-    Button blogButton;
-    Button tbdButton;
-
-    ImageView profilePic;
-
-    TextView username;
-    private OnFragmentInteractionListener mListener;
 
 
     public ProfileFragment() {
@@ -232,26 +194,50 @@ public class ProfileFragment extends Fragment {
         groupButton.setBackgroundColor(TheUtils.getProperColor());
         leadButton = (Button) v.findViewById(R.id.profileLeadButton);
         leadButton.setBackgroundColor(TheUtils.getProperColor());
-        blogButton = (Button) v.findViewById(R.id.profileBlogButton);
-        blogButton.setBackgroundColor(TheUtils.getProperColor());
         tbdButton = (Button) v.findViewById(R.id.button4);
         tbdButton.setBackgroundColor(TheUtils.getProperColor());
 
-
-        /**
-        settingButton = (Button) v.findViewById(R.id.profileSettingButton);
-        settingButton.setOnClickListener(new View.OnClickListener() {
+        blogButton = (Button) v.findViewById(R.id.profileBlogButton);
+        blogButton.setBackgroundColor(TheUtils.getProperColor());
+        blogButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(v.getContext(), NoTabActivity.class);
-                intent.putExtra(SHOW, SHOW_COLOR_OPTIONS);
+                intent.putExtra(SHOW, SHOW_MY_BLOGS);
                 startActivity(intent);
             }
         });
-         **/
 
         return v;
     }
+
+
+    private void setImage(Uri theUri) {
+        Log.d("ProfileFragment", "Here in setImage with uri: " + theUri);
+        try {
+            Bitmap bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), theUri);
+            Log.d("ProfileFragment", "bitmap is: " + bitmap.toString());
+            profilePic.setImageBitmap(bitmap);
+
+            //send to parse
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+            byte[] array = stream.toByteArray();
+            ParseFile file = new ParseFile("profilePic.jpeg", array);
+            file.saveInBackground();
+            ParseUser.getCurrentUser().put("profilePic", file);
+            ParseUser.getCurrentUser().saveInBackground(); //is this necessary?
+
+
+        } catch (FileNotFoundException e) {
+            Log.e("ProfileFragment", "Error: " + e);
+        } catch (IOException e) {
+            Log.e("ProfileFragment", "Error: " + e);
+        }
+    }
+
+
+
 
 
 

@@ -19,7 +19,8 @@
             android:layout_height="wrap_content"
             android:text="Find Blogs"
             android:id="@+id/blogDummyFindBlogButton"
-            android:layout_gravity="center_horizontal" />
+            android:layout_gravity="center_horizontal"
+            android:textColor="#ffffff" />
 
         <Space
             android:layout_width="20px"
