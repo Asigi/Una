@@ -20,6 +20,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.parse.ParseAnalytics;
 import com.parse.ParseUser;
@@ -50,12 +51,7 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
             navigateToEnter();
         } else {
             Log.i(TAG, currentUser.getUsername());
-
-            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-            builder.setMessage("Hello " + currentUser.get("origName"))
-                    .setPositiveButton(android.R.string.ok, null);
-            AlertDialog dialog = builder.create();
-            dialog.show();
+            Toast.makeText(this,"Hello " + currentUser.get("origName"), Toast.LENGTH_LONG ).show();
         }
 
 

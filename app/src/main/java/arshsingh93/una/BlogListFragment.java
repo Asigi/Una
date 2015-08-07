@@ -1,14 +1,20 @@
 package arshsingh93.una;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 
 import com.parse.FindCallback;
@@ -26,8 +32,21 @@ import arshsingh93.una.model.Blog;
 
 public class BlogListFragment extends ListFragment {
 
+    public final static String SHOW = "show";
+    public final static String LOAD_BLOG = "load blog";
+    public final static String BLOG_TITLE = "blog title";
+    public final static String BLOG_BODY = "blog body";
+    public final static String LOOK_BLOG = "look at blog";
+    public final static String BLOG_AUTHOR = "blog's author";
+    public final static String BLOG_DATE = "blogs creation date";
+
     private OnFragmentInteractionListener mListener;
+    private ListView myListView;
+
     private List<Blog> myBlogList = new ArrayList<>();
+    private List<ParseObject> blogObjects = new ArrayList<>();
+
+    private TextView myEmptyTextView;
 
     public BlogListFragment() {}
 
@@ -38,7 +57,45 @@ public class BlogListFragment extends ListFragment {
         updateBlogList();
 
         setListAdapter(new ArrayAdapter<Blog>(getActivity(),
-                android.R.layout.simple_list_item_1, android.R.id.text1, myBlogList));
+                android.R.layout.simple_list_item_1, android.R.id.text1, myBlogList) {
+
+        });
+    }
+
+    public void onListItemClick(ListView l, View v, final int position, long id) {
+        super.onListItemClick(l, v, position, id);
+        String blogId = "ID is: " + myBlogList.get(position).getBlog().get("BlogIdNumber"); //got it working
+        Log.d("BlogListFragment", "I clicked on a blog: " + blogId);
+
+        String[] options = {"View this blog", "Edit this blog"};
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setItems(options, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if (which == 0) {
+                    //open up non-editable blog
+                    Intent intent = new Intent(getActivity(), NoTabActivity.class);
+                    intent.putExtra(SHOW, LOOK_BLOG);
+                    intent.putExtra(BLOG_TITLE, (String) myBlogList.get(position).getBlog().get("Title"));
+                    intent.putExtra(BLOG_BODY, (String) myBlogList.get(position).getBlog().get("Body"));
+                    intent.putExtra(BLOG_AUTHOR, (String) myBlogList.get(position).getBlog().get("Writer"));
+                    intent.putExtra(BLOG_DATE, myBlogList.get(position).getBlog().getCreatedAt());
+                    startActivity(intent);
+                } else {
+                    Intent intent = new Intent(getActivity(), NoTabActivity.class);
+                    intent.putExtra(SHOW, LOAD_BLOG);
+                    intent.putExtra(BLOG_TITLE, (String) myBlogList.get(position).getBlog().get("Title"));
+                    intent.putExtra(BLOG_BODY, (String) myBlogList.get(position).getBlog().get("Body"));
+                    startActivity(intent);
+                }
+            }
+        });
+        builder.show();
+
+
+
+
+
     }
 
 
@@ -48,18 +105,20 @@ public class BlogListFragment extends ListFragment {
         query.findInBackground(new FindCallback<ParseObject>() {
             public void done(List<ParseObject> blogList, ParseException e) {
                 if (e == null) {
-                    for (ParseObject o: blogList){
-                        myBlogList.add(new Blog((String) o.get("Title")
-                                , (String) o.get("Body")
-                                , (ParseUser) o.get("User")));
+                    blogObjects = new ArrayList<ParseObject>(blogList);
+                    for (ParseObject o : blogList) {
+                        Blog b = new Blog(o);
+                        myBlogList.add(b);
+
                     }
-                    Log.d("score", "Retrieved " + blogList.size() + " blogs");
+                    Log.d("BlogListFragmentTEST", "Retrieved " + blogList.size() + " blogs");
                 } else {
-                    Log.d("score", "Error: " + e.getMessage());
+                    Log.d("BlogListFragmentTEST", "Error: " + e.getMessage());
                 }
             }
         });
     }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -70,6 +129,13 @@ public class BlogListFragment extends ListFragment {
 
         return view;
     }
+
+
+
+
+
+
+
 
 
 

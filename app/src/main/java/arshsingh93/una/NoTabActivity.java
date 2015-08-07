@@ -7,6 +7,8 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v4.app.FragmentTransaction;
 import android.os.Bundle;
+import android.util.Log;
+import android.widget.RelativeLayout;
 
 import arshsingh93.una.Unused.colorListFragment;
 
@@ -15,9 +17,13 @@ public class NoTabActivity extends ActionBarActivity implements colorListFragmen
         BlogWriterFragment.OnFragmentInteractionListener,
         BlogListFragment.OnFragmentInteractionListener {
 
+
+    public final static String BLOG_TITLE = "title";
+    public final static String BLOG_BODY = "body";
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
        /** getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN); **/ //this hides the small bar at the very top (with the battery,etc.).
@@ -25,6 +31,8 @@ public class NoTabActivity extends ActionBarActivity implements colorListFragmen
         TheUtils.onActivityCreateSetTheme(this);
         setContentView(R.layout.activity_no_tab);
         //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        RelativeLayout layout = (RelativeLayout) findViewById(R.id.non_tab_container);
+        layout.setBackgroundColor(TheUtils.getProperColor());
 
         FragmentManager fm = getSupportFragmentManager();
         Fragment fragment;
@@ -34,6 +42,26 @@ public class NoTabActivity extends ActionBarActivity implements colorListFragmen
             fragment = new BlogListFragment();
         } else if (intent.getStringExtra(BlogDummyFragment.SHOW).equals(BlogDummyFragment.CREATE_BLOG)) {
             fragment = new BlogWriterFragment();
+
+            String title = "";
+            String body = "";
+
+            Bundle args = new Bundle();
+            args.putString(BlogListFragment.BLOG_TITLE, title);
+            args.putString(BlogListFragment.BLOG_BODY, body);
+            fragment.setArguments(args);
+
+        } else if (intent.getStringExtra(BlogListFragment.SHOW).equals(BlogListFragment.LOAD_BLOG)){
+            fragment = new BlogWriterFragment();
+
+            String title = intent.getStringExtra(BlogListFragment.BLOG_TITLE); //were good here
+            String body = intent.getStringExtra(BlogListFragment.BLOG_BODY);
+
+            Bundle args = new Bundle();
+            args.putString(BlogListFragment.BLOG_TITLE, title);
+            args.putString(BlogListFragment.BLOG_BODY, body); //were good here
+            fragment.setArguments(args);
+
         } else {
             fragment = new colorListFragment();
         }

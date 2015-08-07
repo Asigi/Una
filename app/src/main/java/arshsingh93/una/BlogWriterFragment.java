@@ -9,6 +9,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,11 +21,6 @@ import com.parse.ParseObject;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
-import arshsingh93.una.BlogHelper;
-import arshsingh93.una.LoginActivity;
-import arshsingh93.una.MainActivity;
-import arshsingh93.una.R;
-import arshsingh93.una.TheUtils;
 import arshsingh93.una.model.Blog;
 
 
@@ -40,12 +36,19 @@ public class BlogWriterFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
 
-
+    private String myBlogTitle;
+    private String myBlogBody;
 
     public BlogWriterFragment() {}
+
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d("BlogWriterFragmentTEST", "in onCreate method: ");
+        myBlogTitle = getArguments().getString(BlogListFragment.BLOG_TITLE); //null here
+        myBlogBody = getArguments().getString(BlogListFragment.BLOG_BODY);
+        Log.d("BlogWriterFragmentTEST", "in onCreate method #2");
     }
 
     @Override
@@ -53,11 +56,14 @@ public class BlogWriterFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_blog_writer, container, false);
+        Log.d("BlogWriterFragmentTEST", "in onCreateView method");
 
         myBlogHelper = new BlogHelper(getActivity());
 
         title = (EditText) v.findViewById(R.id.blogWriterTitle);
         body = (EditText) v.findViewById(R.id.blogWriterBody);
+        title.setText(myBlogTitle);
+        body.setText(myBlogBody);
 
         saveButton = (Button) v.findViewById(R.id.blogWriterSaveButton);
         saveButton.setBackgroundColor(TheUtils.getProperColor());
@@ -119,12 +125,16 @@ public class BlogWriterFragment extends Fragment {
                 } else {
 
                     ParseUser user = ParseUser.getCurrentUser();
-                    Blog blog = new Blog(titleText, bodyText, user);
-                    ParseObject blogObject = blog.getBlog();
+                    final Blog blog = new Blog(titleText, bodyText, user);
+                    final ParseObject blogObject = blog.getBlog();
                     blogObject.saveInBackground(new SaveCallback() {
                         @Override
                         public void done(ParseException e) {
                             if (e == null) {
+                                Log.d("BlogWriterFragmentTEST", blogObject.getObjectId());
+                                String anId = blogObject.getObjectId();
+                                blogObject.put("BlogIdNumber", anId);
+                                blogObject.saveInBackground();
                                 AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                                 builder.setMessage("Your blog has been published!")
                                         .setTitle("Success")
@@ -158,7 +168,9 @@ public class BlogWriterFragment extends Fragment {
 
 
 
+    public void loadUp(String title, String body) {
 
+    }
 
 
 
