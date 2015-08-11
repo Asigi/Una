@@ -1,6 +1,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
-    android:layout_height="match_parent" tools:context="arshsingh93.una.BlogLookerFragment">
+    android:layout_height="match_parent" tools:context="arshsingh93.una.BlogLookerFragment"
+    android:background="#ffffff"
+    android:id="@+id/LookerLayout">
 
     <!-- TODO: Update blank fragment layout -->
 
@@ -8,12 +10,17 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="The Title of the Blog"
+        android:text="The Title of the Blog. It is a very long title and has to wrap around "
         android:id="@+id/LookerTitle"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="25dp"
-        android:layout_marginBottom="25dp" />
+        android:layout_marginBottom="25dp"
+        android:capitalize="none"
+        android:clickable="false"
+        android:gravity="center_horizontal"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp" />
 
     <ScrollView
         android:layout_width="match_parent"
@@ -31,7 +38,7 @@
 
 
             <LinearLayout
-                android:orientation="horizontal"
+                android:orientation="vertical"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_below="@+id/LookerTitle"
@@ -49,6 +56,10 @@
                     android:layout_weight="1"
                     android:layout_gravity="center_horizontal"
                     android:gravity="center" />
+
+                <Space
+                    android:layout_width="20px"
+                    android:layout_height="20px" />
 
                 <TextView
                     android:layout_width="match_parent"
@@ -77,43 +88,65 @@
                 android:weightSum="4"
                 android:gravity="center">
 
-                <ImageButton
+                <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:id="@+id/LookerUpVoteButton"
                     android:layout_weight="1"
-                    android:clickable="false"
-                    android:src="@drawable/ic_thumb_up_black_24dp" />
+                    android:clickable="true"
+                    android:src="@drawable/ic_thumb_up_black_24dp"
+                    android:padding="5dp"
+                    android:background="#ffe0e0e0"
+                    android:layout_margin="5dp" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="0"
-                    android:id="@+id/LookerVoteCount" />
+                    android:id="@+id/LookerVoteCount"
+                    android:layout_margin="5dp" />
 
-                <ImageButton
+                <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:id="@+id/LookerDownVoteButton"
                     android:layout_weight="1"
-                    android:src="@drawable/ic_thumb_down_black_24dp" />
+                    android:src="@drawable/ic_thumb_down_black_24dp"
+                    android:clickable="true"
+                    android:padding="5dp"
+                    android:layout_margin="5dp"
+                    android:background="#ffe0e0e0" />
+
+
             </LinearLayout>
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceSmall"
-                android:text="This is the Body of the blog"
+                android:text="This is the Body of the blog. An indent will automatically be added to the front of this first paragraph when a user views this blog"
                 android:id="@+id/LookerBody"
                 android:layout_marginTop="30dp"
                 android:layout_marginLeft="15dp"
                 android:layout_marginRight="15dp"
-                android:layout_marginBottom="10dp" />
+                android:layout_marginBottom="10dp"
+                android:password="false"
+                android:phoneNumber="false"
+                android:singleLine="false" />
 
 
         </LinearLayout>
 
     </ScrollView>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="test Button"
+        android:id="@+id/LookerTestButton"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="68dp" />
 
 
 </RelativeLayout>

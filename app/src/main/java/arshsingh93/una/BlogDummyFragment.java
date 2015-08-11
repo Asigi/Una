@@ -5,16 +5,28 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+import com.parse.FindCallback;
+import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
 
+import java.util.List;
+
+/**
+ * This is the middle tab on the main activity.
+ * It is temporarily called BlogDummy but will eventually be called SearchCreate.
+ */
 public class BlogDummyFragment extends Fragment {
 
     public static final String SHOW = "show";
     public static final String CREATE_BLOG = "Create blog";
+    public static final String FIND_BLOGS = "Find blogs";
 
     Button findBlogButton;
     Button createBlogButton;
@@ -42,6 +54,15 @@ public class BlogDummyFragment extends Fragment {
         loadBlogButton = (Button) v.findViewById(R.id.blogDummyLoadBlogButton);
         loadBlogButton.setBackgroundColor(TheUtils.getProperColor());
 
+        findBlogButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(v.getContext(), NoTabActivity.class);
+                intent.putExtra(SHOW, FIND_BLOGS);
+                startActivity(intent);
+            }
+        });
+
 
         createBlogButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -52,6 +73,7 @@ public class BlogDummyFragment extends Fragment {
             }
         });
 
+        /** load a blog from sqlite **/
         loadBlogButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

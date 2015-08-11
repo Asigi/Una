@@ -5,8 +5,7 @@
     android:paddingTop="0dp"
     android:paddingBottom="0dp"
     android:id="@+id/non_tab_container"
-    tools:context="arshsingh93.una.NoTabActivity"
-    android:background="#ffffff">
+    tools:context="arshsingh93.una.NoTabActivity">
 
     <TextView
         android:layout_width="wrap_content"

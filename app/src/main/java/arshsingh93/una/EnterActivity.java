@@ -19,6 +19,11 @@ import com.parse.ParseUser;
 import com.parse.RequestPasswordResetCallback;
 import com.parse.SignUpCallback;
 
+import java.util.ArrayList;
+
+import arshsingh93.una.model.Blog;
+import arshsingh93.una.model.Group;
+
 
 public class EnterActivity extends AppCompatActivity {
     private static final String TAG = EnterActivity.class.getSimpleName();
@@ -175,6 +180,9 @@ public class EnterActivity extends AppCompatActivity {
             newUser.setPassword(password);
             newUser.setEmail(email);
             newUser.put("origName", originalUsername); //keep the original username intact for display
+            newUser.put("LikedBlogs", new ArrayList<Blog>());
+            newUser.put("GroupMember", new ArrayList<Group>());
+            newUser.put("RandomList", new Blog[10]);
             newUser.signUpInBackground(new SignUpCallback() {
                 @Override
                 public void done(ParseException e) {

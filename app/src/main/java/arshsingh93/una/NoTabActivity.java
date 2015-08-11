@@ -7,15 +7,15 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v4.app.FragmentTransaction;
 import android.os.Bundle;
-import android.util.Log;
-import android.widget.RelativeLayout;
 
 import arshsingh93.una.Unused.colorListFragment;
+import arshsingh93.una.model.Blog;
 
 
 public class NoTabActivity extends ActionBarActivity implements colorListFragment.OnFragmentInteractionListener,
         BlogWriterFragment.OnFragmentInteractionListener,
-        BlogListFragment.OnFragmentInteractionListener {
+        BlogListFragment.OnFragmentInteractionListener,
+        BlogLookerFragment.OnFragmentInteractionListener {
 
 
     public final static String BLOG_TITLE = "title";
@@ -31,38 +31,77 @@ public class NoTabActivity extends ActionBarActivity implements colorListFragmen
         TheUtils.onActivityCreateSetTheme(this);
         setContentView(R.layout.activity_no_tab);
         //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        RelativeLayout layout = (RelativeLayout) findViewById(R.id.non_tab_container);
-        layout.setBackgroundColor(TheUtils.getProperColor());
 
         FragmentManager fm = getSupportFragmentManager();
         Fragment fragment;
         Intent intent = getIntent();
 
         if (intent.getStringExtra(ProfileFragment.SHOW).equals(ProfileFragment.SHOW_MY_BLOGS)) {
+            /** Opens up a list of blogs that the user wrote **/
             fragment = new BlogListFragment();
-        } else if (intent.getStringExtra(BlogDummyFragment.SHOW).equals(BlogDummyFragment.CREATE_BLOG)) {
-            fragment = new BlogWriterFragment();
+            Bundle args = new Bundle();
+            args.putString(BlogListFragment.BLOG_WHAT, BlogListFragment.BLOG_MINE);
+            fragment.setArguments(args);
 
+        } else if (intent.getStringExtra(BlogDummyFragment.SHOW).equals(ProfileFragment.SHOW_MY_LIKED_BLOGS)) {
+            /**opens up a list of blogs that the user likes **/
+            fragment = new BlogListFragment();
+            Bundle args = new Bundle();
+            args.putString(BlogListFragment.BLOG_WHAT, BlogListFragment.BLOG_LIKE);
+            fragment.setArguments(args);
+
+        } else if (intent.getStringExtra(BlogDummyFragment.SHOW).equals(BlogDummyFragment.FIND_BLOGS)) {
+            /** Opens up a fragment which lets you see a list of blogs that were written by someone else **/
+            fragment = new BlogListFragment();
+            Bundle args = new Bundle();
+            args.putString(BlogListFragment.BLOG_WHAT, BlogListFragment.BLOG_FOREIGN);
+            fragment.setArguments(args);
+
+        } else if (intent.getStringExtra(BlogDummyFragment.SHOW).equals(BlogDummyFragment.CREATE_BLOG)) {
+            /** Opens up a fragment which lets you create a blog **/
+            fragment = new BlogWriterFragment();
             String title = "";
             String body = "";
-
             Bundle args = new Bundle();
             args.putString(BlogListFragment.BLOG_TITLE, title);
             args.putString(BlogListFragment.BLOG_BODY, body);
             fragment.setArguments(args);
 
         } else if (intent.getStringExtra(BlogListFragment.SHOW).equals(BlogListFragment.LOAD_BLOG)){
+            /** Opens up a fragment which lets you edit a blog that you previously created.**/
+            /**Note that this will eventually be changed. maybe**/
             fragment = new BlogWriterFragment();
-
             String title = intent.getStringExtra(BlogListFragment.BLOG_TITLE); //were good here
             String body = intent.getStringExtra(BlogListFragment.BLOG_BODY);
-
             Bundle args = new Bundle();
             args.putString(BlogListFragment.BLOG_TITLE, title);
             args.putString(BlogListFragment.BLOG_BODY, body); //were good here
             fragment.setArguments(args);
 
+        } else if (intent.getStringExtra(BlogListFragment.SHOW).equals(BlogListFragment.LOOK_BLOG)) {
+            /**Open up a fragment which lets you look at (but not edit) a blog **/
+            fragment = new BlogLookerFragment();
+            if (intent.getStringExtra(BlogListFragment.BLOG_WHAT) != BlogListFragment.BLOG_LIKE) {
+                String id = intent.getStringExtra(BlogListFragment.BLOG_ID);
+                String author = intent.getStringExtra(BlogListFragment.BLOG_AUTHOR);
+                String title = intent.getStringExtra(BlogListFragment.BLOG_TITLE);
+                String body = intent.getStringExtra(BlogListFragment.BLOG_BODY);
+                String date = intent.getStringExtra(BlogListFragment.BLOG_DATE);
+                String vote = intent.getStringExtra(BlogListFragment.BLOG_VOTE);
+                Bundle args = new Bundle();
+                args.putString(BlogListFragment.BLOG_ID, id);
+                args.putString(BlogListFragment.BLOG_TITLE, title);
+                args.putString(BlogListFragment.BLOG_BODY, body);
+                args.putString(BlogListFragment.BLOG_DATE, date);
+                args.putString(BlogListFragment.BLOG_AUTHOR, author);
+                args.putString(BlogListFragment.BLOG_VOTE, vote);
+                fragment.setArguments(args);
+            } else {
+
+            }
+
         } else {
+            /**This is just a default fragment **/
             fragment = new colorListFragment();
         }
 
@@ -70,6 +109,19 @@ public class NoTabActivity extends ActionBarActivity implements colorListFragmen
         fragmentTransaction.add(R.id.non_tab_container, fragment); //changed from .replace
         fragmentTransaction.commit();
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     @Override

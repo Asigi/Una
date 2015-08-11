@@ -20,9 +20,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.parse.FindCallback;
 import com.parse.GetDataCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
+import com.parse.ParseObject;
+import com.parse.ParseRelation;
 import com.parse.ParseUser;
 
 import java.io.ByteArrayOutputStream;
@@ -30,7 +33,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 
@@ -39,11 +44,14 @@ public class ProfileFragment extends Fragment {
     public static final String SHOW = "show"; //TODO delete this once settings button has been moved to options menu.
     public static final String SHOW_COLOR_OPTIONS = "show color options";
     public static final String SHOW_MY_BLOGS = "show my blogs";
+    public static final String SHOW_MY_LIKED_BLOGS = "show the blogs that I like";
 
     public static final int TAKE_PHOTO_REQUEST = 0;
     public static final int CHOOSE_PHOTO_REQUEST = 1;
     public static final int MEDIA_TYPE_IMAGE = 4;
-    //Button settingButton;
+
+    public ParseRelation<ParseObject> blogLikeRelation;
+
     public Button groupButton;
     public Button leadButton;
     public Button blogButton;
@@ -51,6 +59,7 @@ public class ProfileFragment extends Fragment {
     public ImageView profilePic;
     public TextView username;
     private OnFragmentInteractionListener mListener;
+
     protected Uri mMediaUri;
     protected DialogInterface.OnClickListener mDialogInterface = new DialogInterface.OnClickListener() {
         @Override
@@ -177,18 +186,21 @@ public class ProfileFragment extends Fragment {
                 dialog.show();
             }
         });
-        ParseFile picFile = (ParseFile) ParseUser.getCurrentUser().get("profilePic");
-        picFile.getDataInBackground(new GetDataCallback() {
-            @Override
-            public void done(byte[] bytes, ParseException e) {
-                if (e == null) {
-                    Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-                    profilePic.setImageBitmap(bitmap);
-                } else {
-                    //unable to load image. //TODO
+        if (ParseUser.getCurrentUser().get("profilePic") != null) {
+            ParseFile picFile = (ParseFile) ParseUser.getCurrentUser().get("profilePic");
+            picFile.getDataInBackground(new GetDataCallback() {
+                @Override
+                public void done(byte[] bytes, ParseException e) {
+                    if (e == null) {
+                        Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                        profilePic.setImageBitmap(bitmap);
+                    } else {
+                        //unable to load image. //TODO
+                    }
                 }
-            }
-        });
+
+            });
+        }
 
         groupButton = (Button) v.findViewById(R.id.profileGroupButton);
         groupButton.setBackgroundColor(TheUtils.getProperColor());
@@ -201,10 +213,40 @@ public class ProfileFragment extends Fragment {
         blogButton.setBackgroundColor(TheUtils.getProperColor());
         blogButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(v.getContext(), NoTabActivity.class);
-                intent.putExtra(SHOW, SHOW_MY_BLOGS);
-                startActivity(intent);
+            public void onClick(final View view) {
+                String[] options = {"Blogs I wrote", "Blogs I like"};
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                builder.setItems(options, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        if (which == 0) {
+                            Intent intent = new Intent(view.getContext(), NoTabActivity.class);
+                            intent.putExtra(SHOW, SHOW_MY_BLOGS);
+                            startActivity(intent);
+                        } else {
+
+                            blogLikeRelation = ParseUser.getCurrentUser().getRelation("blogLikes");
+                            blogLikeRelation.getQuery().findInBackground(new FindCallback<ParseObject>() {
+                                @Override
+                                public void done(List<ParseObject> blogLikeList, ParseException e) {
+                                    if (e == null) {
+                                        Log.d("ProfileFragment", "size of blogLikeList: " + blogLikeList.size());
+                                        TheUtils.setMyParseBlogs(blogLikeList);
+
+                                        Intent intent = new Intent(view.getContext(), NoTabActivity.class);
+                                        intent.putExtra(SHOW, SHOW_MY_LIKED_BLOGS);
+                                        startActivity(intent);
+
+                                    } else {
+                                        Log.d("ProfileFragment", "ParseException for blogLikeRelation.getQuery(): " + e);
+                                        //do something about error. Try showing a dialog box that tells user that he hasn't liked any blogs yet.
+                                    }
+                                }
+                            });
+                        }
+                    }
+                });
+                builder.show();
             }
         });
 
@@ -212,6 +254,10 @@ public class ProfileFragment extends Fragment {
     }
 
 
+    /**
+     * Set the profile image of this account
+     * @param theUri the uri for the photo
+     */
     private void setImage(Uri theUri) {
         Log.d("ProfileFragment", "Here in setImage with uri: " + theUri);
         try {

@@ -16,7 +16,6 @@ public class UnaApplication extends Application { //the application class is the
         Parse.enableLocalDatastore(this);
         Parse.initialize(this, "2i0CNaI5uozJ7BCGXMpfr1yucrJkYlPpg207wM4N",
                 "WtMn4uEQKXobFnNYasRsPKtiADfiyS9AVtE5gKQ6");
-
     }
 
 
