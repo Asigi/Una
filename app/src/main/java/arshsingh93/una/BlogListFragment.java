@@ -58,6 +58,7 @@ public class BlogListFragment extends ListFragment {
             });
         }  else if (type.equals(BLOG_LIKE)) {
             /** Show the list of blogs that the user likes. This list is already updated in TheUtils. **/
+            TheUtils.loadLikedBlogs(); //TODO move this and most other loading to when the blog first opens.
             Log.d("BlogListFragment", "size of liked list is: " + TheUtils.getBlogLikeList().size());
             setListAdapter(new ArrayAdapter<Blog>(getActivity(),
                     android.R.layout.simple_list_item_1, android.R.id.text1, TheUtils.getBlogLikeList()) {

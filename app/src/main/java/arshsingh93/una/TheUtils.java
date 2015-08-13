@@ -1,6 +1,7 @@
 package arshsingh93.una;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -9,7 +10,6 @@ import android.util.Log;
 
 import com.parse.DeleteCallback;
 import com.parse.FindCallback;
-import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
@@ -36,8 +36,9 @@ public class TheUtils {
     private static List<Blog> foreignBlogList = new ArrayList<>(); //list of blogs not written by the user
 
     private static ParseRelation<ParseObject> myBlogLikeRelations; //this will be set when user updates their like blogs
+    private static List<ParseObject> myParseLikeBlogs; //this will be set when user updates their like blogs
     private static ArrayList<Blog> myBlogLikedList; //this will be set when user updates their like blogs
-    private static List<ParseObject> myParseBlogs; //this will be set when user updates their like blogs
+
 
     private static SharedPreferences sharedPreferences;
 
@@ -155,13 +156,17 @@ public class TheUtils {
         public static Blog getFromBlogList(String theType, int position) {
             Log.d("TheUtils", "in getFromBlogList");
             if (theType == BlogListFragment.BLOG_MINE) {
+                Log.d("TheUtils", "in getFromBlogList blog_mine");
                 return myBlogList.get(position);
             } else if (theType == BlogListFragment.BLOG_FOREIGN) {
+                Log.d("TheUtils", "in getFromBlogList, blog_foreign list: " + foreignBlogList);
+                Log.d("TheUtils", "blog_foreign, likelist: " + myBlogLikedList);
                 return foreignBlogList.get(position);
             } else if (theType == BlogListFragment.BLOG_LIKE) {
                 Log.d("TheUtils", "in getFromBlogList, myBlogLikedList is " + myBlogLikedList);
                 return myBlogLikedList.get(position);
             } else {
+                Log.d("TheUtils", "in getFromBlogList ELSE");
                 return new Blog("TheUtils mistake", "getFromBlogList method", ParseUser.getCurrentUser());
             }
         }
@@ -184,10 +189,7 @@ public class TheUtils {
         query.findInBackground(new FindCallback<ParseObject>() {
             public void done(List<ParseObject> blogList, ParseException e) {
                 if (e == null) {
-                    //TODO everytime I click Find Blogs in middle tab, I get another set of blogs which get add to the set
-                    //TODO ...that I already have. This increases the size of foreignBlogList by a value equal to blogList.size().
-                    //TODO ...So  I have 2 choices. Either empty foreignBlogList or add new found blogs into foreignBlogList.
-                    foreignBlogList.clear(); //going with my first choice.
+                    foreignBlogList.clear(); //prevent multiple sets of blogs from being added on top of one another.
                     for (ParseObject o : blogList) {
                         Blog b = new Blog(o);
                         foreignBlogList.add(b);
@@ -217,10 +219,17 @@ public class TheUtils {
                 Log.d("TheUtils", "loadLikeBlogs, in done method");
                 if (e == null) {
                     Log.d("TheUtils", "no ParseException");
-                    myParseBlogs = list;
+                    myParseLikeBlogs = list;
                     updateBlogLikeList();
                     saveBlogLikeLocal(list);
                 } else {
+                    /*
+                    AlertDialog.Builder builder = new AlertDialog.Builder(theContext);
+                    builder.setTitle("Error");
+                    builder.setMessage("" + e);
+                    builder.show();
+                     */
+
                     Log.d("TheUtils", "ParseException for blogLikeRelation.getQuery(): " + e);
                 }
             }
@@ -250,9 +259,9 @@ public class TheUtils {
      * Adds an object to the blogLike relation list.
      * @param theObject is a ParseObject that is a blog on Parse.
      */
-    public static void addToBlogLikeRelation(ParseObject theObject) {
-        Log.d("TheUtils", "theObject parameter is null: " + (theObject == null));
-        Log.d("TheUtils", "myBlogLikeRelations is null: " + (myBlogLikeRelations == null));
+    private static void addToBlogLikeRelation(ParseObject theObject) {
+        //Log.d("TheUtils", "theObject parameter is null: " + (theObject == null));
+        //Log.d("TheUtils", "myBlogLikeRelations is null: " + (myBlogLikeRelations == null));
         myBlogLikeRelations.add(theObject);
     }
 
@@ -282,11 +291,11 @@ public class TheUtils {
      */
     private static void updateBlogLikeList() {
         myBlogLikedList = new ArrayList<>();
-        for (ParseObject pObject : myParseBlogs) {
+        for (ParseObject pObject : myParseLikeBlogs) {
             Blog aBlog = new Blog(pObject);
             myBlogLikedList.add(aBlog);
         }
-        Log.d("TheUtils", "size of myParseBlogs: " + myParseBlogs.size());
+        Log.d("TheUtils", "size of myParseLikeBlogs: " + myParseLikeBlogs.size());
         Log.d("TheUtils", "myBlogLikedList: " +  myBlogLikedList);
     }
 
@@ -310,9 +319,31 @@ public class TheUtils {
      * TODO ...ANS: I dont think so, because blogLikeList would not be updated, although blogLikeRelation would be.
      * @param theBlog the blog that the user liked.
      */
-    public static void addToBlogLikeList(Blog theBlog) {
+    private static void addToBlogLikeList(Blog theBlog) {
         myBlogLikedList.add(theBlog);
     }
+
+    /**
+     * I wrote this method to help keep my local parse store correct.
+     * @param theObject a parse object blog.
+     */
+    public static void addToParseLikeBlogs(ParseObject theObject) {
+        myParseLikeBlogs.add(theObject);
+    }
+
+
+    /**
+     * Updates the various lists associated with liking blogs.
+     * @param theBool depending on the boolean value, the current blog will be
+     *                added to the like lists (if boolean is true) or the current
+     *                blog will be removed from the like lists (if boolean is false).
+     */
+    public static void updateVariousLikeBlogLists(boolean theBool) {
+        myBlogLikeRelations.add(myCurrentBlog.getBlog());
+        myParseLikeBlogs.add(myCurrentBlog.getBlog());
+        myBlogLikedList.add(myCurrentBlog);
+    }
+
 
     /**
      * Sets the current blog that the user is looking at.
@@ -333,6 +364,11 @@ public class TheUtils {
         return myCurrentBlog;
     }
 
+    public static void incrementVote(int theNum) {
+        myCurrentBlog.getBlog().increment("Vote", theNum);
+
+
+    }
 
 
 

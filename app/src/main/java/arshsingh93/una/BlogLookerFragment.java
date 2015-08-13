@@ -1,11 +1,13 @@
 package arshsingh93.una;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
+import android.view.KeyEvent; //CHECK HERE
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +15,7 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.parse.ParseObject;
 import com.parse.ParseRelation;
@@ -82,6 +85,25 @@ public class BlogLookerFragment extends Fragment {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_blog_looker, container, false);
 
+        v.setFocusableInTouchMode(true);
+        v.requestFocus();
+
+        v.setOnKeyListener(new View.OnKeyListener() { //TODO this has multiple imports, check all types.
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if (event.getAction() == KeyEvent.ACTION_DOWN) {
+                    if (keyCode == KeyEvent.KEYCODE_BACK) {
+                        Toast.makeText(getActivity(), "Back Pressed", Toast.LENGTH_SHORT).show();
+
+                        //TODO now make the screen actually go back because it no longer is...
+                        return true;
+                    }
+                }
+                return false;
+            }
+        });
+
+
         blogTitleText = (TextView) v.findViewById(R.id.LookerTitle);
         blogBodyText =  (TextView) v.findViewById(R.id.LookerBody);
         blogVoteText =  (TextView) v.findViewById(R.id.LookerVoteCount);
@@ -98,7 +120,8 @@ public class BlogLookerFragment extends Fragment {
         blogVoteText.setText(myBlogVotes + "");
         blogBodyText.setText(myBlogBody);
 
-
+        //TODO //DISABLE ABILITY to like or dislike IF USER OWNS THIS BLOG (set invisible?) Check if currentUser's name is equal to author.
+        //TODO set the color of blogVoteUpButton to propercolor when user opens blog.
         blogVoteUpButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -106,16 +129,22 @@ public class BlogLookerFragment extends Fragment {
                 blogVoteUpButton.setBackgroundColor(TheUtils.getProperColor());  //like button to user's preferred color
 
                 if (!TheUtils.existsInBlogLikedList(TheUtils.getCurrentBlog())) {
-                    TheUtils.addToBlogLikeRelation(TheUtils.getCurrentBlog().getBlog());
+                    TheUtils.updateVariousLikeBlogLists(true);
+                    if (!downVoteCast) {
+                        TheUtils.incrementVote(1);
+                    } else {
+                        TheUtils.incrementVote(2);
+                    }
+
+                } else {
+                    blogVoteUpButton.setBackgroundColor(0xffe0e0e0);
+                    TheUtils.updateVariousLikeBlogLists(false);
+                    TheUtils.incrementVote(-1);
                 }
-                    //TheUtils.addToBlogLikeList(TheUtils.getCurrentBlog()); Note sure about this.
 
-                //}
+                //save myCurrentBlog after user clicks back button.
+                ParseUser.getCurrentUser().saveInBackground(); //TODO do this after user clicks back button
 
-                //save at the end
-                ParseUser.getCurrentUser().saveInBackground();
-
-                //DISABLE THIS ABILITY IF USER OWNS THIS BLOG (set invisible?) Check if currentUser's name is equal to author.
 
 //                if (!TheUtils.checkMyBlogListForBlog(TheUtils.getCurrentBlog())) { //if the user has not already liked this blog, then
 //                    TheUtils.addToMyBlogList(TheUtils.getCurrentBlog()); //add this blog to user's liked blog list
@@ -139,7 +168,18 @@ public class BlogLookerFragment extends Fragment {
                     downVoteCast = true;
                     blogVoteDownButton.setBackgroundColor(TheUtils.getProperColor()); //turn dislike button to user's preferred color
                     blogVoteUpButton.setBackgroundColor(0xffe0e0e0); //turn like button to gray.
-
+                    TheUtils.updateVariousLikeBlogLists(false);
+                    if (!TheUtils.existsInBlogLikedList(TheUtils.getCurrentBlog())) {
+                        TheUtils.incrementVote(-1);
+                    } else {
+                        TheUtils.incrementVote(-2);
+                    }
+                } else {
+                    downVoteCast = false;
+                    blogVoteDownButton.setBackgroundColor(0xffe0e0e0);
+                    TheUtils.incrementVote(1);
+                }
+                //TODO update what the user sees
 //                    if (TheUtils.checkAndRemoveBlog(TheUtils.getCurrentBlog())) {
 //                        blogVoteText.setText(((Integer.parseInt(blogVoteText.getText().toString()) - 2) + "")); //decrement the value that the user sees.
 //                        myBlogVotes = Integer.parseInt(blogVoteText.getText().toString());
@@ -147,7 +187,6 @@ public class BlogLookerFragment extends Fragment {
 //                        blogVoteText.setText(((Integer.parseInt(blogVoteText.getText().toString()) - 1) + "")); //decrement the value that the user sees.
 //                        myBlogVotes = Integer.parseInt(blogVoteText.getText().toString());
 //                    }
-                }
             }
         });
 
@@ -155,19 +194,6 @@ public class BlogLookerFragment extends Fragment {
 
         return v;
     }
-
-
-
-
-    @OnClick(R.id.LookerUpVoteButton)
-    public void likeThisBlog(View view) {
-
-    }
-
-
-
-
-
 
 
 

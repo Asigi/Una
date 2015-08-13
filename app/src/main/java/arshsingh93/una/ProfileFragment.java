@@ -221,15 +221,14 @@ public class ProfileFragment extends Fragment {
                             intent.putExtra(SHOW, SHOW_MY_BLOGS);
                             startActivity(intent);
                         } else if (which == 1){
-                            Boolean worked = TheUtils.loadLikedBlogs();
-                            if (worked) {//if true do intent
+                            TheUtils.loadLikedBlogs(); //assume this works
                                 Intent intent = new Intent(view.getContext(), NoTabActivity.class);
                                 intent.putExtra(SHOW, SHOW_MY_LIKED_BLOGS);
                                 startActivity(intent);
-                            } else {
+                            //} else {
                                 //TODO if false do something about error.
                                 //Try showing a dialog box that tells user that he hasn't liked any blogs yet.
-                            }
+                            //}
                         }
                     }
                 });
