@@ -7,11 +7,13 @@ import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
 
 import java.util.Calendar;
@@ -52,7 +54,7 @@ public class BlogListFragment extends ListFragment {
         super.onCreate(savedInstanceState);
         type = getArguments().getString(BLOG_WHAT, BLOG_MINE); //default will be BLOG_MINE
         if (type.equals(BLOG_MINE)) {
-            TheUtils.updateBlogList(); //TODO also include the blogs that the user has liked.
+            TheUtils.updateBlogList();
             setListAdapter(new ArrayAdapter<Blog>(getActivity(),
                     android.R.layout.simple_list_item_1, android.R.id.text1, TheUtils.getMyBlogList()) {
             });
@@ -84,6 +86,22 @@ public class BlogListFragment extends ListFragment {
         mySwipeLayout.setOnRefreshListener(myOnRefreshListener);
         mySwipeLayout.setColorSchemeColors(TheUtils.getProperColor());
 
+        view.setFocusableInTouchMode(true);
+        view.requestFocus();
+
+        view.setOnKeyListener(new View.OnKeyListener() { //TODO this has multiple imports, check all types.
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if (event.getAction() == KeyEvent.ACTION_DOWN) {
+                    if (keyCode == KeyEvent.KEYCODE_BACK) {
+                        Toast.makeText(getActivity(), "Back Pressed", Toast.LENGTH_SHORT).show();
+                        getActivity().finish(); // :) this is good.
+                        return true;
+                    }
+                }
+                return false;
+            }
+        });
 
 
 

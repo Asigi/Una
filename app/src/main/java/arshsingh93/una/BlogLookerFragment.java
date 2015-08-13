@@ -6,6 +6,7 @@ import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.view.KeyEvent; //CHECK HERE
 import android.view.LayoutInflater;
@@ -94,7 +95,10 @@ public class BlogLookerFragment extends Fragment {
                 if (event.getAction() == KeyEvent.ACTION_DOWN) {
                     if (keyCode == KeyEvent.KEYCODE_BACK) {
                         Toast.makeText(getActivity(), "Back Pressed", Toast.LENGTH_SHORT).show();
-
+                        getActivity().finish(); // :) this is good.
+                        //now do the saving.
+                        //TODO NOTE: maybe dont actually save a blog like this because multiple people might have
+                        //TODO ...incremented the vote value by liking/disliking. try incrementing backend.
                         //TODO now make the screen actually go back because it no longer is...
                         return true;
                     }

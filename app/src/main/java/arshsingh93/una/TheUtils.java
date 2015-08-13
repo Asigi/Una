@@ -125,11 +125,13 @@ public class TheUtils {
 
     //===================================================================================================================
 
+    //static field
+    public static boolean updateDone = false; //set to true after updating
 
     /**
      * Update the list of blogs that this user has written.
      */
-    public static void updateBlogList() {
+    public static boolean updateBlogList() {
         ParseQuery<ParseObject> query = ParseQuery.getQuery("Blog");
         query.whereEqualTo("User", ParseUser.getCurrentUser());
         query.findInBackground(new FindCallback<ParseObject>() {
@@ -138,7 +140,7 @@ public class TheUtils {
                     for (ParseObject o : blogList) {
                         Blog b = new Blog(o);
                         myBlogList.add(b);
-
+                        updateDone = true;
                     }
                     Log.d("BlogListFragmentTEST", "Retrieved " + blogList.size() + " blogs");
                 } else {
@@ -146,6 +148,13 @@ public class TheUtils {
                 }
             }
         });
+
+        return false;
+    }
+
+    public static void doneNotice(boolean theBool) {
+        Log.d("TheUtils", "doneNotice entered");
+
     }
 
     /**

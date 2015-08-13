@@ -20,9 +20,6 @@ public class NoTabActivity extends ActionBarActivity implements colorListFragmen
 
     private static String TAG = NoTabActivity.class.getSimpleName();
 
-    public final static String BLOG_TITLE = "title";
-    public final static String BLOG_BODY = "body";
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -117,6 +114,7 @@ public class NoTabActivity extends ActionBarActivity implements colorListFragmen
         Log.d(TAG, "about to being transaction");
         FragmentTransaction fragmentTransaction = fm.beginTransaction();
         fragmentTransaction.add(R.id.non_tab_container, fragment); //changed from .replace
+        fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
     }
 

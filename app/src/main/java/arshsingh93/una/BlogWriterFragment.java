@@ -10,11 +10,13 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.parse.ParseException;
 import com.parse.ParseObject;
@@ -57,6 +59,23 @@ public class BlogWriterFragment extends Fragment {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_blog_writer, container, false);
         Log.d("BlogWriterFragmentTEST", "in onCreateView method");
+
+        v.setFocusableInTouchMode(true);
+        v.requestFocus();
+
+        v.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if (event.getAction() == KeyEvent.ACTION_DOWN) {
+                    if (keyCode == KeyEvent.KEYCODE_BACK) {
+                        //TODO ask the writer if s/he is sure about going back. Warn about losing what they've written.
+                        getActivity().finish();
+                        return true;
+                    }
+                }
+                return false;
+            }
+        });
 
         myBlogHelper = new BlogHelper(getActivity());
 
@@ -167,9 +186,13 @@ public class BlogWriterFragment extends Fragment {
     }
 
 
-
+    /**
+     * Loads the data from SQLite.
+     * @param title is the title of the blog
+     * @param body is the body of the blog
+     */
     public void loadUp(String title, String body) {
-
+        //TODO
     }
 
 
