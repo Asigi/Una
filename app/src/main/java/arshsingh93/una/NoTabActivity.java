@@ -7,6 +7,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v4.app.FragmentTransaction;
 import android.os.Bundle;
+import android.util.Log;
 
 import arshsingh93.una.Unused.colorListFragment;
 import arshsingh93.una.model.Blog;
@@ -14,9 +15,10 @@ import arshsingh93.una.model.Blog;
 
 public class NoTabActivity extends ActionBarActivity implements colorListFragment.OnFragmentInteractionListener,
         BlogWriterFragment.OnFragmentInteractionListener,
-        BlogListFragment.OnFragmentInteractionListener,
+
         BlogLookerFragment.OnFragmentInteractionListener {
 
+    private static String TAG = NoTabActivity.class.getSimpleName();
 
     public final static String BLOG_TITLE = "title";
     public final static String BLOG_BODY = "body";
@@ -38,6 +40,7 @@ public class NoTabActivity extends ActionBarActivity implements colorListFragmen
 
         if (intent.getStringExtra(ProfileFragment.SHOW).equals(ProfileFragment.SHOW_MY_BLOGS)) {
             /** Opens up a list of blogs that the user wrote **/
+            Log.d(TAG, "SHOW_MY_BLOGS");
             fragment = new BlogListFragment();
             Bundle args = new Bundle();
             args.putString(BlogListFragment.BLOG_WHAT, BlogListFragment.BLOG_MINE);
@@ -45,6 +48,7 @@ public class NoTabActivity extends ActionBarActivity implements colorListFragmen
 
         } else if (intent.getStringExtra(BlogDummyFragment.SHOW).equals(ProfileFragment.SHOW_MY_LIKED_BLOGS)) {
             /**opens up a list of blogs that the user likes **/
+            Log.d(TAG, "SHOW_MY_LIKED_BLOGS");
             fragment = new BlogListFragment();
             Bundle args = new Bundle();
             args.putString(BlogListFragment.BLOG_WHAT, BlogListFragment.BLOG_LIKE);
@@ -52,6 +56,7 @@ public class NoTabActivity extends ActionBarActivity implements colorListFragmen
 
         } else if (intent.getStringExtra(BlogDummyFragment.SHOW).equals(BlogDummyFragment.FIND_BLOGS)) {
             /** Opens up a fragment which lets you see a list of blogs that were written by someone else **/
+            Log.d(TAG, "FIND_BLOGS");
             fragment = new BlogListFragment();
             Bundle args = new Bundle();
             args.putString(BlogListFragment.BLOG_WHAT, BlogListFragment.BLOG_FOREIGN);
@@ -59,6 +64,7 @@ public class NoTabActivity extends ActionBarActivity implements colorListFragmen
 
         } else if (intent.getStringExtra(BlogDummyFragment.SHOW).equals(BlogDummyFragment.CREATE_BLOG)) {
             /** Opens up a fragment which lets you create a blog **/
+            Log.d(TAG, "CREATE_BLOG");
             fragment = new BlogWriterFragment();
             String title = "";
             String body = "";
@@ -70,6 +76,7 @@ public class NoTabActivity extends ActionBarActivity implements colorListFragmen
         } else if (intent.getStringExtra(BlogListFragment.SHOW).equals(BlogListFragment.LOAD_BLOG)){
             /** Opens up a fragment which lets you edit a blog that you previously created.**/
             /**Note that this will eventually be changed. maybe**/
+            Log.d(TAG, "LOAD_BLOG");
             fragment = new BlogWriterFragment();
             String title = intent.getStringExtra(BlogListFragment.BLOG_TITLE); //were good here
             String body = intent.getStringExtra(BlogListFragment.BLOG_BODY);
@@ -80,6 +87,7 @@ public class NoTabActivity extends ActionBarActivity implements colorListFragmen
 
         } else if (intent.getStringExtra(BlogListFragment.SHOW).equals(BlogListFragment.LOOK_BLOG)) {
             /**Open up a fragment which lets you look at (but not edit) a blog **/
+            Log.d(TAG, "LOOK_BLOG");
             fragment = new BlogLookerFragment();
             if (intent.getStringExtra(BlogListFragment.BLOG_WHAT) != BlogListFragment.BLOG_LIKE) {
                 String id = intent.getStringExtra(BlogListFragment.BLOG_ID);
@@ -102,9 +110,11 @@ public class NoTabActivity extends ActionBarActivity implements colorListFragmen
 
         } else {
             /**This is just a default fragment **/
+            Log.d(TAG, "colorList");
             fragment = new colorListFragment();
         }
 
+        Log.d(TAG, "about to being transaction");
         FragmentTransaction fragmentTransaction = fm.beginTransaction();
         fragmentTransaction.add(R.id.non_tab_container, fragment); //changed from .replace
         fragmentTransaction.commit();

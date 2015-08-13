@@ -19,8 +19,6 @@ public class Blog {
     public Blog(String theTitle, String theBody, ParseUser theWriter) {
         blog = new ParseObject("Blog");
         blog.put("Title", theTitle);
-        blog.put("LikeList", Arrays.asList(new ArrayList<ParseUser>())); //creates an array in parse
-        blog.get("LikeList");
         blog.put("User", theWriter);
         blog.put("Writer", theWriter.get("origName"));
         blog.put("Vote", 0);

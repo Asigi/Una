@@ -4,10 +4,22 @@
     android:layout_height="match_parent" tools:context="arshsingh93.una.BlogListFragment"
     android:background="#ffffff">
 
-    <ListView android:id="@android:id/list" android:layout_width="wrap_content"
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefreshLayout"
+        android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_alignParentTop="true"
-        android:layout_alignParentBottom="true"
-        />
+        android:layout_alignParentLeft="true"
+        >
+
+        <ListView
+            android:id="@android:id/list"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            />
+
+    </android.support.v4.widget.SwipeRefreshLayout>
 
 </RelativeLayout>

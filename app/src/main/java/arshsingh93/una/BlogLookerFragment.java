@@ -105,13 +105,15 @@ public class BlogLookerFragment extends Fragment {
                 blogVoteDownButton.setBackgroundColor(0xffe0e0e0); //turn dislike button to gray color,
                 blogVoteUpButton.setBackgroundColor(TheUtils.getProperColor());  //like button to user's preferred color
 
+                if (!TheUtils.existsInBlogLikedList(TheUtils.getCurrentBlog())) {
+                    TheUtils.addToBlogLikeRelation(TheUtils.getCurrentBlog().getBlog());
+                }
+                    //TheUtils.addToBlogLikeList(TheUtils.getCurrentBlog()); Note sure about this.
 
-                ParseUser user = ParseUser.getCurrentUser();
-                ParseRelation<ParseObject> relation = user.getRelation("blogLikes");
-                relation.add(TheUtils.getCurrentBlog().getBlog());
-                user.saveInBackground();
+                //}
 
-
+                //save at the end
+                ParseUser.getCurrentUser().saveInBackground();
 
                 //DISABLE THIS ABILITY IF USER OWNS THIS BLOG (set invisible?) Check if currentUser's name is equal to author.
 

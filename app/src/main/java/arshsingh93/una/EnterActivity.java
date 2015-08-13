@@ -180,9 +180,7 @@ public class EnterActivity extends AppCompatActivity {
             newUser.setPassword(password);
             newUser.setEmail(email);
             newUser.put("origName", originalUsername); //keep the original username intact for display
-            newUser.put("LikedBlogs", new ArrayList<Blog>());
-            newUser.put("GroupMember", new ArrayList<Group>());
-            newUser.put("RandomList", new Blog[10]);
+
             newUser.signUpInBackground(new SignUpCallback() {
                 @Override
                 public void done(ParseException e) {

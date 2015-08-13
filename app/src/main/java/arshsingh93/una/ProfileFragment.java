@@ -20,7 +20,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.parse.FindCallback;
 import com.parse.GetDataCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
@@ -33,9 +32,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
 
 
@@ -223,26 +220,16 @@ public class ProfileFragment extends Fragment {
                             Intent intent = new Intent(view.getContext(), NoTabActivity.class);
                             intent.putExtra(SHOW, SHOW_MY_BLOGS);
                             startActivity(intent);
-                        } else {
-
-                            blogLikeRelation = ParseUser.getCurrentUser().getRelation("blogLikes");
-                            blogLikeRelation.getQuery().findInBackground(new FindCallback<ParseObject>() {
-                                @Override
-                                public void done(List<ParseObject> blogLikeList, ParseException e) {
-                                    if (e == null) {
-                                        Log.d("ProfileFragment", "size of blogLikeList: " + blogLikeList.size());
-                                        TheUtils.setMyParseBlogs(blogLikeList);
-
-                                        Intent intent = new Intent(view.getContext(), NoTabActivity.class);
-                                        intent.putExtra(SHOW, SHOW_MY_LIKED_BLOGS);
-                                        startActivity(intent);
-
-                                    } else {
-                                        Log.d("ProfileFragment", "ParseException for blogLikeRelation.getQuery(): " + e);
-                                        //do something about error. Try showing a dialog box that tells user that he hasn't liked any blogs yet.
-                                    }
-                                }
-                            });
+                        } else if (which == 1){
+                            Boolean worked = TheUtils.loadLikedBlogs();
+                            if (worked) {//if true do intent
+                                Intent intent = new Intent(view.getContext(), NoTabActivity.class);
+                                intent.putExtra(SHOW, SHOW_MY_LIKED_BLOGS);
+                                startActivity(intent);
+                            } else {
+                                //TODO if false do something about error.
+                                //Try showing a dialog box that tells user that he hasn't liked any blogs yet.
+                            }
                         }
                     }
                 });

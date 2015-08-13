@@ -7,8 +7,13 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
+import com.parse.DeleteCallback;
+import com.parse.FindCallback;
 import com.parse.Parse;
+import com.parse.ParseException;
 import com.parse.ParseObject;
+import com.parse.ParseQuery;
+import com.parse.ParseRelation;
 import com.parse.ParseUser;
 
 import java.util.ArrayList;
@@ -27,9 +32,13 @@ public class TheUtils {
 
     private static Blog myCurrentBlog;
 
-    private static ArrayList<Blog> myBlogLikedList; //this will be initialized when user clicks blog button in profilefragment.
+    private static List<Blog> myBlogList = new ArrayList<>();
+    private static List<Blog> foreignBlogList = new ArrayList<>(); //list of blogs not written by the user
 
-    private static List<ParseObject> myParseBlogs;
+    private static ParseRelation<ParseObject> myBlogLikeRelations; //this will be set when user updates their like blogs
+    private static ArrayList<Blog> myBlogLikedList; //this will be set when user updates their like blogs
+    private static List<ParseObject> myParseBlogs; //this will be set when user updates their like blogs
+
     private static SharedPreferences sharedPreferences;
 
     /**
@@ -44,7 +53,9 @@ public class TheUtils {
         activity.startActivity(new Intent(activity, activity.getClass()));
     }
 
-    /** Set the theme of the activity, according to the configuration. */
+    /**
+     * Set the theme of the activity, according to the configuration.
+     */
     public static void onActivityCreateSetTheme(Activity activity) {
         switch (sTheme) {
             case THEME_GREEN:
@@ -64,19 +75,20 @@ public class TheUtils {
 
     /**
      * Called for updating buttons and such.
+     *
      * @return the prefered color that buttons and stuff should be.
      */
     public static int getProperColor() {
-            switch (sTheme) {
-                case THEME_GREEN:
-                    return 0xff56c367;
-                case THEME_BLUE:
-                    return 0xff00aac3;
-                case THEME_RED:
-                    return 0xffff4444; //just right
-                    // return 0xffff0000; too red
-                   // return 0xffc35b4e; too brown
-            }
+        switch (sTheme) {
+            case THEME_GREEN:
+                return 0xff56c367;
+            case THEME_BLUE:
+                return 0xff00aac3;
+            case THEME_RED:
+                return 0xffff4444; //just right
+            // return 0xffff0000; too red
+            // return 0xffc35b4e; too brown
+        }
         return 0x56c367;
     }
 
@@ -97,6 +109,7 @@ public class TheUtils {
 
     /**
      * Updates the app to the color theme that the user prefers (when app is opened).....I think....
+     *
      * @param activity the activity that this method is called from.
      */
     public static void loadColorTheme(Activity activity) {
@@ -106,43 +119,257 @@ public class TheUtils {
         }
     }
 
+
+
+
+    //===================================================================================================================
+
+
     /**
-     * Takes in a list of parseobjects which were queried from from Parse using the relations.
-     * This method also updates the list of Blog objects that are stored in this class.
-     * @param theParseBlogList ParseObject blogs.
+     * Update the list of blogs that this user has written.
      */
-    public static void setMyParseBlogs(List<ParseObject> theParseBlogList) {
-        myParseBlogs = theParseBlogList;
-        updateBlogLikeList();
+    public static void updateBlogList() {
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("Blog");
+        query.whereEqualTo("User", ParseUser.getCurrentUser());
+        query.findInBackground(new FindCallback<ParseObject>() {
+            public void done(List<ParseObject> blogList, ParseException e) {
+                if (e == null) {
+                    for (ParseObject o : blogList) {
+                        Blog b = new Blog(o);
+                        myBlogList.add(b);
+
+                    }
+                    Log.d("BlogListFragmentTEST", "Retrieved " + blogList.size() + " blogs");
+                } else {
+                    Log.d("BlogListFragmentTEST", "Error: " + e.getMessage());
+                }
+            }
+        });
     }
+
+    /**
+     *
+     * @param position of the blog in the list
+     * @return Blog corresponding to the position.
+     */
+        public static Blog getFromBlogList(String theType, int position) {
+            Log.d("TheUtils", "in getFromBlogList");
+            if (theType == BlogListFragment.BLOG_MINE) {
+                return myBlogList.get(position);
+            } else if (theType == BlogListFragment.BLOG_FOREIGN) {
+                return foreignBlogList.get(position);
+            } else if (theType == BlogListFragment.BLOG_LIKE) {
+                Log.d("TheUtils", "in getFromBlogList, myBlogLikedList is " + myBlogLikedList);
+                return myBlogLikedList.get(position);
+            } else {
+                return new Blog("TheUtils mistake", "getFromBlogList method", ParseUser.getCurrentUser());
+            }
+        }
+
+    /**
+     *
+     * @return the list of my blogs
+     */
+    public static List<Blog> getMyBlogList() {
+        return myBlogList;
+    }
+
+
+    /**
+     * Update the list of blogs that this user has not written.
+     */
+    public static void updateForeignBlogList() {
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("Blog");
+        query.whereNotEqualTo("User", ParseUser.getCurrentUser());
+        query.findInBackground(new FindCallback<ParseObject>() {
+            public void done(List<ParseObject> blogList, ParseException e) {
+                if (e == null) {
+                    //TODO everytime I click Find Blogs in middle tab, I get another set of blogs which get add to the set
+                    //TODO ...that I already have. This increases the size of foreignBlogList by a value equal to blogList.size().
+                    //TODO ...So  I have 2 choices. Either empty foreignBlogList or add new found blogs into foreignBlogList.
+                    foreignBlogList.clear(); //going with my first choice.
+                    for (ParseObject o : blogList) {
+                        Blog b = new Blog(o);
+                        foreignBlogList.add(b);
+                    }
+                    Log.d("TheUtils", "Retrieved " + blogList.size() + " foreign blogs");
+                    Log.d("TheUtils", "I now have " + foreignBlogList.size() + " foreign blogs");
+                } else {
+                    Log.d("TheUtils", "Error: " + e.getMessage());
+                }
+            }
+        });
+    }
+
+    public static final String MY_LIKE_BLOGS = "the blogs I like";
+
+    /**
+     * Loads and updates the relations of liked blogs as well as the related lists.
+     * It also caches queries to ParseLocal.
+     */
+    public static void loadLikedBlogs() {
+        myBlogLikeRelations = ParseUser.getCurrentUser().getRelation("blogLikes");
+        Log.d("TheUtils", "In updateBlogLikeRelations, name of myBlogLikeRelations: " + myBlogLikeRelations);
+
+        myBlogLikeRelations.getQuery().findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> list, ParseException e) {
+                Log.d("TheUtils", "loadLikeBlogs, in done method");
+                if (e == null) {
+                    Log.d("TheUtils", "no ParseException");
+                    myParseBlogs = list;
+                    updateBlogLikeList();
+                    saveBlogLikeLocal(list);
+                } else {
+                    Log.d("TheUtils", "ParseException for blogLikeRelation.getQuery(): " + e);
+                }
+            }
+        });
+    }
+
+    /**
+     * Saves the ParseObject list to ParseLocal.
+     * @param blogLikeList a list of ParseObjects
+     */
+    public static void saveBlogLikeLocal(final List<ParseObject> blogLikeList) {
+        // Release any objects previously pinned for this query.
+        ParseObject.unpinAllInBackground(MY_LIKE_BLOGS, blogLikeList, new DeleteCallback() {
+            public void done(ParseException e) {
+                if (e != null) {
+                    Log.e("TheUtils", "In saveBlogLikeLocal, unpinAll, error: " + e);
+                    return;
+                }
+                // Add the latest results for this query to the cache.
+                ParseObject.pinAllInBackground(MY_LIKE_BLOGS, blogLikeList);
+            }
+        });
+    }
+
+
+    /**
+     * Adds an object to the blogLike relation list.
+     * @param theObject is a ParseObject that is a blog on Parse.
+     */
+    public static void addToBlogLikeRelation(ParseObject theObject) {
+        Log.d("TheUtils", "theObject parameter is null: " + (theObject == null));
+        Log.d("TheUtils", "myBlogLikeRelations is null: " + (myBlogLikeRelations == null));
+        myBlogLikeRelations.add(theObject);
+    }
+
+    /**
+     * Checks if the blog exists in the list of liked blogs.
+     * @param theBlog the blog to check
+     * @return true if exists, false otherwise
+     */
+    public static boolean existsInBlogLikedList(Blog theBlog) {
+        Log.d("TheUtils", "theBlog id: " + theBlog.getId());
+        Log.d("TheUtils", myBlogLikedList + " existsInBlogLikeList? only if its not null");
+        if (myBlogLikedList == null) {
+            loadLikedBlogs();
+        }
+        Log.d("TheUtils", myBlogLikedList + " existsInBlogLikeList? only if its not null");
+        if (myBlogLikedList.contains(theBlog)) {
+            return true;
+        }
+        Log.d("TheUtils", theBlog.getId() + " existsInBlogLikeList: false");
+        return false;
+    }
+
+
 
     /**
      * Uses the list of ParseObject blogs to update a list of Blogs that the user likes.
      */
     private static void updateBlogLikeList() {
         myBlogLikedList = new ArrayList<>();
-        for (ParseObject pObject: myParseBlogs) {
-            Log.d("TheUtils", "size of myParseBlogs: " + myParseBlogs.size());
+        for (ParseObject pObject : myParseBlogs) {
             Blog aBlog = new Blog(pObject);
             myBlogLikedList.add(aBlog);
         }
+        Log.d("TheUtils", "size of myParseBlogs: " + myParseBlogs.size());
+        Log.d("TheUtils", "myBlogLikedList: " +  myBlogLikedList);
     }
 
+    /**
+     * Returns the list of liked blogs.
+     * @return the list that contains the stuff I like.
+     */
     public static ArrayList<Blog> getBlogLikeList() {
         return myBlogLikedList; //TODO maybe return a clone?
     }
 
+    /**
+     * This updates the list of Blog objects (not ParseObject) that this user likes.
+     * TODO right now it is not necessary to call this method from BlogLookerFragment when user likes a blog because the
+     * TODO ... list of blogs that the user likes is always updated when the user clicks on "blogs" in their profile page.
+     * TODO Something to think about: what happens if user is viewing a blog, likes it, and then clicks back button?
+     * TODO ...Will that blog be added to the list of blogs the user sees when he backs out of the blog?
+     * TODO ...JUST REALIZED: A user would't like a blog that is already on his like list. Instead, think about this:
+     * TODO ...What if the user opens their like list, unlikes a blog and then goes back? Will the blog be removed from their
+     * TODO ...list of liked blogs?
+     * TODO ...ANS: I dont think so, because blogLikeList would not be updated, although blogLikeRelation would be.
+     * @param theBlog the blog that the user liked.
+     */
+    public static void addToBlogLikeList(Blog theBlog) {
+        myBlogLikedList.add(theBlog);
+    }
 
-
+    /**
+     * Sets the current blog that the user is looking at.
+     * @param theBlog
+     */
     public static void setCurrentBlog(Blog theBlog) {
         Log.d("TheUtils", "setCurrentBlog before: " + myCurrentBlog);
         myCurrentBlog = theBlog;
         Log.d("TheUtils", "setCurrentBlog after: " + myCurrentBlog);
     }
 
+    /**
+     * NOTE: current blog is set when a user chooses to look at a blog. It is not reset until the
+     * user chooses to look at another blog.
+     * @return the current blog that the user is looking at or the last blog the user looked at.
+     */
     public static Blog getCurrentBlog() {
         return myCurrentBlog;
     }
+
+
+
+
+
+    /**
+     *
+     * @return the list of foreign blogs
+     */
+    public static List<Blog> getForeignBlogList() {
+        return foreignBlogList;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+}
 
 
 
@@ -207,5 +434,3 @@ public class TheUtils {
 //        ParseUser.getCurrentUser().put("LikedBlogs", list);
 //        ParseUser.getCurrentUser().saveInBackground();
 //    }
-
-}
