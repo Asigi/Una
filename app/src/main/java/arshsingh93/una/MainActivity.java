@@ -40,6 +40,9 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
         super.onCreate(savedInstanceState);
         TheUtils.loadColorTheme(this);
         TheUtils.onActivityCreateSetTheme(this);
+
+        TheUtils.loadLikedBlogs();
+
         setContentView(R.layout.activity_main);
 
         ParseAnalytics.trackAppOpenedInBackground(getIntent());

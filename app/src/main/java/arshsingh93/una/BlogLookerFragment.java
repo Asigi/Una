@@ -50,11 +50,7 @@ public class BlogLookerFragment extends Fragment {
     private ImageView blogVoteUpButton;
     private ImageView blogVoteDownButton;
 
-    private Button myTestButton;
-
     private Boolean downVoteCast = false;
-
-
 
     private OnFragmentInteractionListener mListener;
 
@@ -116,8 +112,6 @@ public class BlogLookerFragment extends Fragment {
         blogVoteUpButton = (ImageView) v.findViewById(R.id.LookerUpVoteButton);
         blogVoteDownButton = (ImageView) v.findViewById(R.id.LookerDownVoteButton);
 
-        myTestButton = (Button) v.findViewById(R.id.LookerTestButton);
-
         blogTitleText.setText(myBlogTitle);
         blogAuthorText.setText("Written by: " + myBlogAuthor);
         blogDateText.setText(myBlogDate);
@@ -136,8 +130,10 @@ public class BlogLookerFragment extends Fragment {
                     TheUtils.updateVariousLikeBlogLists(true);
                     if (!downVoteCast) {
                         TheUtils.incrementVote(1);
+                        //add blog to local like list.
                     } else {
-                        TheUtils.incrementVote(2);
+                        TheUtils.incrementVote(2); //vote up and cancel the downvote
+                        //remove blog from Local dislike list.
                     }
 
                 } else {

@@ -92,7 +92,7 @@ public class NoTabActivity extends ActionBarActivity implements colorListFragmen
                 String title = intent.getStringExtra(BlogListFragment.BLOG_TITLE);
                 String body = intent.getStringExtra(BlogListFragment.BLOG_BODY);
                 String date = intent.getStringExtra(BlogListFragment.BLOG_DATE);
-                String vote = intent.getStringExtra(BlogListFragment.BLOG_VOTE);
+                String vote = intent.getIntExtra(BlogListFragment.BLOG_VOTE, -999) + "";
                 Bundle args = new Bundle();
                 args.putString(BlogListFragment.BLOG_ID, id);
                 args.putString(BlogListFragment.BLOG_TITLE, title);

@@ -30,6 +30,10 @@ public class TheUtils {
     public final static int THEME_BLUE = 1;
     public final static int THEME_RED = 2;
 
+    /**
+     * This is the current blog that the user is viewing. It is only reset when the
+     * user looks at another blog.
+     */
     private static Blog myCurrentBlog;
 
     private static List<Blog> myBlogList = new ArrayList<>();
@@ -39,7 +43,20 @@ public class TheUtils {
     private static List<ParseObject> myParseLikeBlogs; //this will be set when user updates their like blogs
     private static ArrayList<Blog> myBlogLikedList; //this will be set when user updates their like blogs
 
+    /*
+  * Gets set to true if there was no error while updating.
+  * Gets set to false if there was an error while updating.
+   */
+    public static boolean updateDone = false; //set to true after updating
 
+    /**
+     * Gets set to the error message given while updating.
+     */
+    public static String blogError = "";
+
+    /**
+     * Local storage.
+     */
     private static SharedPreferences sharedPreferences;
 
     /**
@@ -125,8 +142,6 @@ public class TheUtils {
 
     //===================================================================================================================
 
-    //static field
-    public static boolean updateDone = false; //set to true after updating
 
     /**
      * Update the list of blogs that this user has written.
@@ -140,11 +155,13 @@ public class TheUtils {
                     for (ParseObject o : blogList) {
                         Blog b = new Blog(o);
                         myBlogList.add(b);
-                        updateDone = true;
+                        doneNotice(true);
                     }
-                    Log.d("BlogListFragmentTEST", "Retrieved " + blogList.size() + " blogs");
+                    Log.d("TheUtils", "Retrieved " + blogList.size() + " blogs");
                 } else {
-                    Log.d("BlogListFragmentTEST", "Error: " + e.getMessage());
+                    doneNotice(false);
+                    setBlogError(e + "");
+                    Log.d("TheUtils", "Error: " + e.getMessage());
                 }
             }
         });
@@ -152,9 +169,24 @@ public class TheUtils {
         return false;
     }
 
+    /**
+     * Called to update the variable that holds whether or not updating was succesful.
+     * @param theBool false if error, true otherwise.
+     */
     public static void doneNotice(boolean theBool) {
-        Log.d("TheUtils", "doneNotice entered");
+        Log.d("TheUtils", "doneNotice entered. Current value is " + updateDone + ", with passed in value: " + theBool);
+        updateDone = theBool;
+        Log.d("TheUtils", "doneNotice exiting. Current value is " + updateDone);
+    }
 
+    /**
+     * Called to update the string that holds the error value.
+     * @param theString error
+     */
+    public static void setBlogError(String theString) {
+        Log.d("TheUtils", "setBlogError entered. Current value is " + blogError + ", with passed in value: " + theString);
+        blogError = theString;
+        Log.d("TheUtils", "setBlogError exiting. Current value is " + blogError);
     }
 
     /**
@@ -231,14 +263,10 @@ public class TheUtils {
                     myParseLikeBlogs = list;
                     updateBlogLikeList();
                     saveBlogLikeLocal(list);
+                    doneNotice(true);
                 } else {
-                    /*
-                    AlertDialog.Builder builder = new AlertDialog.Builder(theContext);
-                    builder.setTitle("Error");
-                    builder.setMessage("" + e);
-                    builder.show();
-                     */
-
+                    doneNotice(false);
+                    setBlogError(e + "");
                     Log.d("TheUtils", "ParseException for blogLikeRelation.getQuery(): " + e);
                 }
             }

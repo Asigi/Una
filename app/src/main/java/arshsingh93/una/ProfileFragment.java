@@ -220,15 +220,27 @@ public class ProfileFragment extends Fragment {
                             Intent intent = new Intent(view.getContext(), NoTabActivity.class);
                             intent.putExtra(SHOW, SHOW_MY_BLOGS);
                             startActivity(intent);
+                            if (TheUtils.updateDone == false) {
+                                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                                builder.setTitle("There was an error").setMessage(TheUtils.blogError);
+                                builder.show();
+                            } else { //updateDone is true
+                                TheUtils.doneNotice(false); //reset it
+                                TheUtils.setBlogError(""); //reset error message
+                            }
                         } else if (which == 1){
                             TheUtils.loadLikedBlogs(); //assume this works
                                 Intent intent = new Intent(view.getContext(), NoTabActivity.class);
                                 intent.putExtra(SHOW, SHOW_MY_LIKED_BLOGS);
                                 startActivity(intent);
-                            //} else {
-                                //TODO if false do something about error.
-                                //Try showing a dialog box that tells user that he hasn't liked any blogs yet.
-                            //}
+                            if (TheUtils.updateDone == false) {
+                                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                                builder.setTitle("There was an error").setMessage(TheUtils.blogError);
+                                builder.show();
+                            } else { //updateDone is true
+                                TheUtils.doneNotice(false); //reset it.
+                                TheUtils.setBlogError("");
+                            }
                         }
                     }
                 });
