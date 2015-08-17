@@ -43,7 +43,7 @@ public class NoTabActivity extends ActionBarActivity implements colorListFragmen
             args.putString(BlogListFragment.BLOG_WHAT, BlogListFragment.BLOG_MINE);
             fragment.setArguments(args);
 
-        } else if (intent.getStringExtra(BlogDummyFragment.SHOW).equals(ProfileFragment.SHOW_MY_LIKED_BLOGS)) {
+        } else if (intent.getStringExtra(ProfileFragment.SHOW).equals(ProfileFragment.SHOW_MY_LIKED_BLOGS)) {
             /**opens up a list of blogs that the user likes **/
             Log.d(TAG, "SHOW_MY_LIKED_BLOGS");
             fragment = new BlogListFragment();
@@ -86,24 +86,29 @@ public class NoTabActivity extends ActionBarActivity implements colorListFragmen
             /**Open up a fragment which lets you look at (but not edit) a blog **/
             Log.d(TAG, "LOOK_BLOG");
             fragment = new BlogLookerFragment();
-            if (intent.getStringExtra(BlogListFragment.BLOG_WHAT) != BlogListFragment.BLOG_LIKE) {
-                String id = intent.getStringExtra(BlogListFragment.BLOG_ID);
-                String author = intent.getStringExtra(BlogListFragment.BLOG_AUTHOR);
-                String title = intent.getStringExtra(BlogListFragment.BLOG_TITLE);
-                String body = intent.getStringExtra(BlogListFragment.BLOG_BODY);
-                String date = intent.getStringExtra(BlogListFragment.BLOG_DATE);
-                String vote = intent.getIntExtra(BlogListFragment.BLOG_VOTE, -999) + "";
-                Bundle args = new Bundle();
-                args.putString(BlogListFragment.BLOG_ID, id);
-                args.putString(BlogListFragment.BLOG_TITLE, title);
-                args.putString(BlogListFragment.BLOG_BODY, body);
-                args.putString(BlogListFragment.BLOG_DATE, date);
-                args.putString(BlogListFragment.BLOG_AUTHOR, author);
-                args.putString(BlogListFragment.BLOG_VOTE, vote);
-                fragment.setArguments(args);
-            } else {
+            String id = intent.getStringExtra(BlogListFragment.BLOG_ID);
+            String author = intent.getStringExtra(BlogListFragment.BLOG_AUTHOR);
+            String title = intent.getStringExtra(BlogListFragment.BLOG_TITLE);
+            String body = intent.getStringExtra(BlogListFragment.BLOG_BODY);
+            String date = intent.getStringExtra(BlogListFragment.BLOG_DATE);
+            int vote = intent.getIntExtra(BlogListFragment.BLOG_VOTE, -999);
+            Bundle args = new Bundle();
+            args.putString(BlogListFragment.BLOG_ID, id);
+            args.putString(BlogListFragment.BLOG_TITLE, title);
+            args.putString(BlogListFragment.BLOG_BODY, body);
+            args.putString(BlogListFragment.BLOG_DATE, date);
+            args.putString(BlogListFragment.BLOG_AUTHOR, author);
+            args.putInt(BlogListFragment.BLOG_VOTE, vote);
 
+            if (intent.getStringExtra(BlogListFragment.BLOG_WHAT).equals(BlogListFragment.BLOG_LIKE)) {
+                args.putString(BlogListFragment.BLOG_WHAT, BlogListFragment.BLOG_LIKE);
+            } else if (intent.getStringExtra(BlogListFragment.BLOG_WHAT).equals(BlogListFragment.BLOG_FOREIGN)) {
+                args.putString(BlogListFragment.BLOG_WHAT, BlogListFragment.BLOG_FOREIGN);
+            } else if (intent.getStringExtra(BlogListFragment.BLOG_WHAT).equals(BlogListFragment.BLOG_MINE)) {
+                args.putString(BlogListFragment.BLOG_WHAT, BlogListFragment.BLOG_MINE);
             }
+
+            fragment.setArguments(args);
 
         } else {
             /**This is just a default fragment **/

@@ -57,7 +57,6 @@ public class BlogDummyFragment extends Fragment {
         findBlogButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                TheUtils.loadLikedBlogs();
                 Intent intent = new Intent(v.getContext(), NoTabActivity.class);
                 intent.putExtra(SHOW, FIND_BLOGS);
                 startActivity(intent);

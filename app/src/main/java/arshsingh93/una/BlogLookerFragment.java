@@ -18,9 +18,13 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.parse.GetCallback;
+import com.parse.ParseException;
 import com.parse.ParseObject;
+import com.parse.ParseQuery;
 import com.parse.ParseRelation;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -50,6 +54,8 @@ public class BlogLookerFragment extends Fragment {
     private ImageView blogVoteUpButton;
     private ImageView blogVoteDownButton;
 
+    private String myType;
+
     private Boolean downVoteCast = false;
 
     private OnFragmentInteractionListener mListener;
@@ -71,7 +77,9 @@ public class BlogLookerFragment extends Fragment {
         myBlogBody = getArguments().getString(BlogListFragment.BLOG_BODY, "Body");
         myBlogAuthor = getArguments().getString(BlogListFragment.BLOG_AUTHOR, "Author");
         myBlogDate = getArguments().getString(BlogListFragment.BLOG_DATE, "August 32, 2015");
-        myBlogVotes = getArguments().getInt(BlogListFragment.BLOG_VOTE, 0);
+        myBlogVotes = getArguments().getInt(BlogListFragment.BLOG_VOTE, -999);
+
+        myType = getArguments().getString(BlogListFragment.BLOG_WHAT, BlogListFragment.BLOG_MINE);
     }
 
 
@@ -91,11 +99,32 @@ public class BlogLookerFragment extends Fragment {
                 if (event.getAction() == KeyEvent.ACTION_DOWN) {
                     if (keyCode == KeyEvent.KEYCODE_BACK) {
                         Toast.makeText(getActivity(), "Back Pressed", Toast.LENGTH_SHORT).show();
-                        getActivity().finish(); // :) this is good.
+                        getActivity().finish(); // :) this is good. NOTE: the code after finish() will still run. :)
+
                         //now do the saving.
-                        //TODO NOTE: maybe dont actually save a blog like this because multiple people might have
-                        //TODO ...incremented the vote value by liking/disliking. try incrementing backend.
-                        //TODO now make the screen actually go back because it no longer is...
+                        //TODO save the current blog if any change was made to it.
+//                        if (downVoteCast) {
+                            try {
+                                //if
+                                ParseUser.getCurrentUser().put("blogLikes", TheUtils.myBlogLikeRelations);
+                                ParseUser.getCurrentUser().save();
+                            }catch (ParseException e) {
+                                //do something
+                            }
+//                        }
+
+                        //previous screen should load correctly, minus the current blog if this blog is disliked (if in like list)
+                        Intent intent = new Intent(getActivity(), NoTabActivity.class);
+                        if (myType.equals(BlogListFragment.BLOG_LIKE)) {
+                            intent.putExtra(ProfileFragment.SHOW, ProfileFragment.SHOW_MY_LIKED_BLOGS);
+                        } else if (myType.equals(BlogListFragment.BLOG_MINE)) {
+                            intent.putExtra(ProfileFragment.SHOW, ProfileFragment.SHOW_MY_BLOGS);
+                        } else if (myType.equals(BlogListFragment.BLOG_FOREIGN)) {
+                            intent.putExtra(ProfileFragment.SHOW, BlogDummyFragment.FIND_BLOGS);
+                        }
+
+                        startActivity(intent);
+
                         return true;
                     }
                 }
@@ -118,7 +147,17 @@ public class BlogLookerFragment extends Fragment {
         blogVoteText.setText(myBlogVotes + "");
         blogBodyText.setText(myBlogBody);
 
-        //TODO //DISABLE ABILITY to like or dislike IF USER OWNS THIS BLOG (set invisible?) Check if currentUser's name is equal to author.
+        //DISABLE ABILITY to like or dislike IF USER OWNS THIS BLOG.
+        if (myBlogAuthor.equals(ParseUser.getCurrentUser().getString("origName"))) { //this is working
+            blogVoteUpButton.setVisibility(View.INVISIBLE);
+            blogVoteDownButton.setVisibility(View.INVISIBLE);
+        } else {
+            if (TheUtils.searchBlogLikeLocal()) {
+                blogVoteUpButton.setBackgroundColor(TheUtils.getProperColor());
+            }
+        }
+
+
         //TODO set the color of blogVoteUpButton to propercolor when user opens blog.
         blogVoteUpButton.setOnClickListener(new View.OnClickListener() {
             @Override

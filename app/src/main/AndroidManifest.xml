@@ -29,15 +29,6 @@
             android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name=".SignUpActivity"
-            android:label="@string/title_activity_sign_up"
-            android:screenOrientation="portrait" >
-        </activity>
-        <activity
-            android:name=".ForgottenActivity"
-            android:label="@string/title_activity_forgotten" >
-        </activity>
-        <activity
             android:name=".NoTabActivity"
             android:label="@string/title_activity_no_tab"
             android:parentActivityName=".MainActivity" >

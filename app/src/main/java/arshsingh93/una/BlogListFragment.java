@@ -4,6 +4,8 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.ListFragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
@@ -37,6 +39,8 @@ public class BlogListFragment extends ListFragment {
     public final static String BLOG_DATE = "blogs creation date";
     public final static String BLOG_VOTE = "blog's vote score";
 
+    public final static String BLOG_TYPE = "the type of blog (mine, liked, foreign, etc)";
+
     public final static String BLOG_WHAT = "one of the types of blogs"; //used to differentiate between user's and foreign
     public final static String BLOG_MINE = "My blogs";
     public final static String BLOG_LIKE = "Blogs I like";
@@ -54,19 +58,19 @@ public class BlogListFragment extends ListFragment {
         super.onCreate(savedInstanceState);
         type = getArguments().getString(BLOG_WHAT, BLOG_MINE); //default will be BLOG_MINE
         if (type.equals(BLOG_MINE)) {
-            TheUtils.updateBlogList();
+
             setListAdapter(new ArrayAdapter<Blog>(getActivity(),
                     android.R.layout.simple_list_item_1, android.R.id.text1, TheUtils.getMyBlogList()) {
             });
         }  else if (type.equals(BLOG_LIKE)) {
             /** Show the list of blogs that the user likes. This list is already updated in TheUtils. **/
-            TheUtils.loadLikedBlogs(); //TODO move this and most other loading to when the blog first opens.
+
             Log.d("BlogListFragment", "size of liked list is: " + TheUtils.getBlogLikeList().size());
             setListAdapter(new ArrayAdapter<Blog>(getActivity(),
                     android.R.layout.simple_list_item_1, android.R.id.text1, TheUtils.getBlogLikeList()) {
             });
         } else if (type.equals(BLOG_FOREIGN)){
-            TheUtils.updateForeignBlogList();
+
             setListAdapter(new ArrayAdapter<Blog>(getActivity(),
                     android.R.layout.simple_list_item_1, android.R.id.text1, TheUtils.getForeignBlogList()) {
             });
@@ -77,7 +81,8 @@ public class BlogListFragment extends ListFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_item, container, false);
+        //View view = inflater.inflate(R.layout.fragment_item, container, false);
+        View view = inflater.inflate(R.layout.fragment_blog_list, container, false);
 
 
         //TODO set empty text from here?
@@ -96,6 +101,8 @@ public class BlogListFragment extends ListFragment {
                     if (keyCode == KeyEvent.KEYCODE_BACK) {
                         Toast.makeText(getActivity(), "Back Pressed", Toast.LENGTH_SHORT).show();
                         getActivity().finish(); // :) this is good.
+                        Intent intent = new Intent(getActivity(), MainActivity.class);
+                        startActivity(intent);
                         return true;
                     }
                 }
@@ -128,11 +135,12 @@ public class BlogListFragment extends ListFragment {
                     //open up non-editable blog
                     Intent intent = new Intent(getActivity(), NoTabActivity.class);
                     intent.putExtra(SHOW, LOOK_BLOG);
+                    intent.putExtra(BLOG_WHAT, type);
                     Blog aBlog = TheUtils.getFromBlogList(type, position);
                     intent.putExtra(BLOG_TITLE, (String) aBlog.getBlog().get("Title"));
                     intent.putExtra(BLOG_BODY, (String) aBlog.getBlog().get("Body"));
                     intent.putExtra(BLOG_AUTHOR, (String) aBlog.getBlog().get("Writer"));
-                    intent.putExtra(BLOG_VOTE, (int) aBlog.getBlog().get("Vote"));
+                    intent.putExtra(BLOG_VOTE, aBlog.getBlog().get("Vote") + "");
                     Date date = aBlog.getBlog().getCreatedAt();
                     Calendar cal = Calendar.getInstance();
                     cal.setTime(date);
@@ -162,7 +170,66 @@ public class BlogListFragment extends ListFragment {
         public void onRefresh() {
             //do update
             //TODO Check if internet is available.
-            TheUtils.loadLikedBlogs();
+            //TODO load based on what the value of "type" is.
+
+            if (type == BLOG_LIKE) {
+                TheUtils.loadLikedBlogs2();
+                if (TheUtils.updateDone) {
+                    TheUtils.doneNotice(false);
+                    //reload list
+                    TheUtils.loadBlogLikePinned();
+                    if (TheUtils.updateDone) {
+                        TheUtils.doneNotice(false);
+
+                        getActivity().finish();
+                        Intent intent = new Intent(getActivity(), NoTabActivity.class);
+                        intent.putExtra(ProfileFragment.SHOW, ProfileFragment.SHOW_MY_LIKED_BLOGS);
+                        startActivity(intent);
+
+
+                    } else {
+                        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                        builder.setTitle("Error").setMessage(TheUtils.blogError).show();
+                        TheUtils.setBlogError("");
+                    }
+                    // Reload current fragment
+
+                    //finish()
+                    //intent = noTab, BLOG_LIKE
+                    //add data?
+                    //reload this page
+
+                } else { //error occured
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                    builder.setTitle("Error").setMessage(TheUtils.blogError).show();
+                    TheUtils.setBlogError("");
+                }
+
+            } else if (type == BLOG_MINE) {
+                TheUtils.loadMyBlogList2();
+                if (TheUtils.updateDone) {
+                    TheUtils.doneNotice(false);
+                    //reload list from online because the user might want to see the new vote count.
+                    //reload comments as well? How about allowing user to reload comments. Make viewing comments optional on all blogs.
+
+                } else { //error occured
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                    builder.setTitle("Error").setMessage(TheUtils.blogError).show();
+                    TheUtils.setBlogError("");
+                }
+
+            } else if (type == BLOG_FOREIGN) {
+                TheUtils.loadForeignBlogList2();
+                if (TheUtils.updateDone) {
+                    //reload list
+                    TheUtils.doneNotice(false);
+                } else { //error occured
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                    builder.setTitle("Error").setMessage(TheUtils.blogError).show();
+                    TheUtils.setBlogError("");
+                }
+
+            }
         }
     };
 

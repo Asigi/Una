@@ -41,7 +41,48 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
         TheUtils.loadColorTheme(this);
         TheUtils.onActivityCreateSetTheme(this);
 
-        TheUtils.loadLikedBlogs();
+        if (!TheUtils.FIRST_TIME_MAIN) {
+
+            //TODO How about instead of loading all lists right at the beginning, create a boolean variable for whether each list
+            //TODO ...has been loaded. If its false then load it from online when user clicks on the appropriate button.
+            //TODO ...When app first opens, just load from local datastore instead.
+            //TODO ...This way, a whole bunch of API calls aren't wasted right off the bat.
+
+            //TODO IDEA. Load every single blog right off the bat. And then, sort them into my, liked, foreign after loading?
+            //TODO ...The downside with this idea is that, a max of 1000 parse objects are returned in a query.
+
+            //TODO first check for internet connection.
+
+            TheUtils.loadLikedBlogs2();
+            if (TheUtils.updateDone == false) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle("Error").setMessage(TheUtils.blogError).show();
+            }
+            TheUtils.doneNotice(false); //reset
+            TheUtils.setBlogError(""); //reset
+
+            TheUtils.loadMyBlogList2();
+            if (TheUtils.updateDone == false) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle("Error").setMessage(TheUtils.blogError).show();
+            }
+            TheUtils.doneNotice(false); //reset
+            TheUtils.setBlogError(""); //reset
+
+            TheUtils.loadForeignBlogList2();
+            if (TheUtils.updateDone == false) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle("Error").setMessage(TheUtils.blogError).show();
+            }
+            TheUtils.doneNotice(false); //reset
+            TheUtils.setBlogError(""); //reset
+
+
+            TheUtils.FIRST_TIME_MAIN = true;
+        }
+
+        //TODO try using saveEventually for users who arent in data network. Do this somewhere else.
+
 
         setContentView(R.layout.activity_main);
 
@@ -144,15 +185,6 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
     public void onTabReselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
     }
 
-
-
-
-    private void navigateToLogin() {
-        Intent intent = new Intent(this, arshsingh93.una.LoginActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK); //this prevents you from getting back to the previous page.
-        startActivity(intent);
-    }
 
     private void navigateToEnter() {
         Intent intent = new Intent(this, EnterActivity.class);

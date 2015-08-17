@@ -1,14 +1,11 @@
 package arshsingh93.una;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
-import com.parse.DeleteCallback;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
@@ -25,6 +22,9 @@ import arshsingh93.una.model.Blog;
  * Created by Student on 7/29/2015.
  */
 public class TheUtils {
+
+    public static boolean FIRST_TIME_MAIN = false;
+
     private static int sTheme;
     public final static int THEME_GREEN = 0;
     public final static int THEME_BLUE = 1;
@@ -39,7 +39,7 @@ public class TheUtils {
     private static List<Blog> myBlogList = new ArrayList<>();
     private static List<Blog> foreignBlogList = new ArrayList<>(); //list of blogs not written by the user
 
-    private static ParseRelation<ParseObject> myBlogLikeRelations; //this will be set when user updates their like blogs
+    public static ParseRelation<ParseObject> myBlogLikeRelations; //this will be set when user updates their like blogs
     private static List<ParseObject> myParseLikeBlogs; //this will be set when user updates their like blogs
     private static ArrayList<Blog> myBlogLikedList; //this will be set when user updates their like blogs
 
@@ -138,15 +138,14 @@ public class TheUtils {
     }
 
 
-
-
     //===================================================================================================================
 
 
     /**
      * Update the list of blogs that this user has written.
      */
-    public static boolean updateBlogList() {
+    public static void loadMyBlogList() {
+        Log.d("TheUtils", "In loadMyBlogList()");
         ParseQuery<ParseObject> query = ParseQuery.getQuery("Blog");
         query.whereEqualTo("User", ParseUser.getCurrentUser());
         query.findInBackground(new FindCallback<ParseObject>() {
@@ -157,20 +156,44 @@ public class TheUtils {
                         myBlogList.add(b);
                         doneNotice(true);
                     }
-                    Log.d("TheUtils", "Retrieved " + blogList.size() + " blogs");
+                    Log.d("TheUtils", "In loadMyBlogList(), Retrieved " + blogList.size() + " blogs");
                 } else {
                     doneNotice(false);
-                    setBlogError(e + "");
-                    Log.d("TheUtils", "Error: " + e.getMessage());
+                    setBlogError(e.getMessage() + "");
+                    Log.d("TheUtils", "In loadMyBlogList(), Error: " + e.getMessage());
                 }
             }
         });
 
-        return false;
+    }
+
+    /**
+     * Does not do work in background thread.
+     * Update the list of blogs that this user has written.
+     */
+    public static void loadMyBlogList2() {
+        Log.d("TheUtils", "In loadMyBlogList()");
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("Blog");
+        query.whereEqualTo("User", ParseUser.getCurrentUser());
+        try {
+            List<ParseObject> blogList = query.find();
+            for (ParseObject o : blogList) {
+                Blog b = new Blog(o);
+                myBlogList.add(b);
+                doneNotice(true);
+            }
+            Log.d("TheUtils", "In loadMyBlogList(), Retrieved " + blogList.size() + " blogs");
+
+        } catch (ParseException e) {
+            doneNotice(false);
+            setBlogError(e.getMessage() + "");
+            Log.d("TheUtils", "In loadMyBlogList(), Error: " + e.getMessage());
+        }
     }
 
     /**
      * Called to update the variable that holds whether or not updating was succesful.
+     *
      * @param theBool false if error, true otherwise.
      */
     public static void doneNotice(boolean theBool) {
@@ -181,6 +204,7 @@ public class TheUtils {
 
     /**
      * Called to update the string that holds the error value.
+     *
      * @param theString error
      */
     public static void setBlogError(String theString) {
@@ -190,30 +214,36 @@ public class TheUtils {
     }
 
     /**
-     *
      * @param position of the blog in the list
      * @return Blog corresponding to the position.
      */
-        public static Blog getFromBlogList(String theType, int position) {
-            Log.d("TheUtils", "in getFromBlogList");
-            if (theType == BlogListFragment.BLOG_MINE) {
-                Log.d("TheUtils", "in getFromBlogList blog_mine");
-                return myBlogList.get(position);
-            } else if (theType == BlogListFragment.BLOG_FOREIGN) {
-                Log.d("TheUtils", "in getFromBlogList, blog_foreign list: " + foreignBlogList);
-                Log.d("TheUtils", "blog_foreign, likelist: " + myBlogLikedList);
-                return foreignBlogList.get(position);
-            } else if (theType == BlogListFragment.BLOG_LIKE) {
-                Log.d("TheUtils", "in getFromBlogList, myBlogLikedList is " + myBlogLikedList);
-                return myBlogLikedList.get(position);
-            } else {
-                Log.d("TheUtils", "in getFromBlogList ELSE");
-                return new Blog("TheUtils mistake", "getFromBlogList method", ParseUser.getCurrentUser());
-            }
+    public static Blog getFromBlogList(String theType, int position) {
+        Log.d("TheUtils", "in getFromBlogList");
+
+        if (theType == BlogListFragment.BLOG_MINE) {
+            Log.d("TheUtils", "in getFromBlogList blog_mine");
+
+            return myBlogList.get(position);
+
+        } else if (theType == BlogListFragment.BLOG_FOREIGN) {
+            Log.d("TheUtils", "in getFromBlogList, blog_foreign list: " + foreignBlogList);
+            Log.d("TheUtils", "blog_foreign, likelist: " + myBlogLikedList);
+
+            return foreignBlogList.get(position);
+
+        } else if (theType == BlogListFragment.BLOG_LIKE) {
+            Log.d("TheUtils", "in getFromBlogList, myBlogLikedList is " + myBlogLikedList);
+
+            return myBlogLikedList.get(position);
+
+        } else {
+            Log.d("TheUtils", "in getFromBlogList ELSE");
+
+            return new Blog("TheUtils mistake", "getFromBlogList method", ParseUser.getCurrentUser());
         }
+    }
 
     /**
-     *
      * @return the list of my blogs
      */
     public static List<Blog> getMyBlogList() {
@@ -224,7 +254,8 @@ public class TheUtils {
     /**
      * Update the list of blogs that this user has not written.
      */
-    public static void updateForeignBlogList() {
+    public static void loadForeignBlogList() {
+        Log.d("TheUtils", "In loadForeignBlogList()");
         ParseQuery<ParseObject> query = ParseQuery.getQuery("Blog");
         query.whereNotEqualTo("User", ParseUser.getCurrentUser());
         query.findInBackground(new FindCallback<ParseObject>() {
@@ -235,62 +266,172 @@ public class TheUtils {
                         Blog b = new Blog(o);
                         foreignBlogList.add(b);
                     }
+                    doneNotice(true);
                     Log.d("TheUtils", "Retrieved " + blogList.size() + " foreign blogs");
                     Log.d("TheUtils", "I now have " + foreignBlogList.size() + " foreign blogs");
                 } else {
+                    doneNotice(false);
+                    setBlogError(e.getMessage() + "");
                     Log.d("TheUtils", "Error: " + e.getMessage());
                 }
             }
         });
     }
 
+    /**
+     * Does not do work in background.
+     * Update the list of blogs that this user has not written.
+     */
+    public static void loadForeignBlogList2() {
+        Log.d("TheUtils", "In loadForeignBlogList()");
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("Blog");
+        query.whereNotEqualTo("User", ParseUser.getCurrentUser());
+        try {
+            List<ParseObject> blogList = query.find();
+            foreignBlogList.clear(); //prevent multiple sets of blogs from being added on top of one another.
+            for (ParseObject o : blogList) {
+                Blog b = new Blog(o);
+                foreignBlogList.add(b);
+            }
+            doneNotice(true);
+            Log.d("TheUtils", "Retrieved " + blogList.size() + " foreign blogs");
+            Log.d("TheUtils", "I now have " + foreignBlogList.size() + " foreign blogs");
+        } catch (ParseException e) {
+            doneNotice(false);
+            setBlogError(e.getMessage() + "");
+            Log.d("TheUtils", "Error: " + e.getMessage());
+        }
+    }
+
+
+
+
     public static final String MY_LIKE_BLOGS = "the blogs I like";
 
     /**
      * Loads and updates the relations of liked blogs as well as the related lists.
-     * It also caches queries to ParseLocal.
+     * It also pins found query.
      */
     public static void loadLikedBlogs() {
-        myBlogLikeRelations = ParseUser.getCurrentUser().getRelation("blogLikes");
-        Log.d("TheUtils", "In updateBlogLikeRelations, name of myBlogLikeRelations: " + myBlogLikeRelations);
 
+        //TODO load from local first or save user before loading from online
+        //ParseUser.getCurrentUser().getRelation("RandomMeaninglessStuffForTesting"); I thought this would create a new relation
+        myBlogLikeRelations = ParseUser.getCurrentUser().getRelation("blogLikes");
+        Log.d("TheUtils", "In loadLikedBlogs(), updateBlogLikeRelations, name of myBlogLikeRelations: " + myBlogLikeRelations + ".  PARSE API");
         myBlogLikeRelations.getQuery().findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(List<ParseObject> list, ParseException e) {
-                Log.d("TheUtils", "loadLikeBlogs, in done method");
+                Log.d("TheUtils", "In loadLikedBlogs(), in done method. PARSE API");
                 if (e == null) {
                     Log.d("TheUtils", "no ParseException");
                     myParseLikeBlogs = list;
                     updateBlogLikeList();
-                    saveBlogLikeLocal(list);
+                    saveBlogLikePin(list);
                     doneNotice(true);
                 } else {
                     doneNotice(false);
-                    setBlogError(e + "");
-                    Log.d("TheUtils", "ParseException for blogLikeRelation.getQuery(): " + e);
+                    setBlogError(e.getMessage() + "");
+                    Log.d("TheUtils", "In loadLikedBlogs(), ParseException for blogLikeRelation.getQuery(): " + e);
                 }
             }
         });
+    }
+
+    /**
+     * Does not do its work in background.
+     * Loads and updates the relations of liked blogs as well as the related lists.
+     *
+     * It also pins found query.
+     */
+    public static void loadLikedBlogs2() {
+        //ParseUser.getCurrentUser().getRelation("RandomMeaninglessStuffForTesting");  I thought this would create a new relation
+        //TODO load from local first or save user before loading from online
+
+        myBlogLikeRelations = ParseUser.getCurrentUser().getRelation("blogLikes");
+        Log.d("TheUtils", "In loadLikedBlogs2(), updateBlogLikeRelations, name of myBlogLikeRelations: " + myBlogLikeRelations + ".  PARSE API");
+        try {
+            List<ParseObject> list = myBlogLikeRelations.getQuery().find();
+            myParseLikeBlogs = list;
+            updateBlogLikeList();
+            saveBlogLikePin(list);
+            doneNotice(true);
+        } catch (ParseException e) {
+            doneNotice(false);
+            setBlogError(e.getMessage() + "");
+            Log.d("TheUtils", "In loadLikedBlogs2(), ParseException for blogLikeRelation.getQuery(): " + e);
+        }
     }
 
     /**
      * Saves the ParseObject list to ParseLocal.
      * @param blogLikeList a list of ParseObjects
      */
-    public static void saveBlogLikeLocal(final List<ParseObject> blogLikeList) {
+    public static void saveBlogLikePin(final List<ParseObject> blogLikeList) {
+        Log.e("TheUtils", "In saveBlogLikePin, list size: " + blogLikeList.size());
         // Release any objects previously pinned for this query.
-        ParseObject.unpinAllInBackground(MY_LIKE_BLOGS, blogLikeList, new DeleteCallback() {
-            public void done(ParseException e) {
-                if (e != null) {
-                    Log.e("TheUtils", "In saveBlogLikeLocal, unpinAll, error: " + e);
-                    return;
-                }
-                // Add the latest results for this query to the cache.
-                ParseObject.pinAllInBackground(MY_LIKE_BLOGS, blogLikeList);
-            }
-        });
+        ParseObject.unpinAllInBackground(MY_LIKE_BLOGS);
+        // Add the latest results for this query to the cache.
+        ParseObject.pinAllInBackground(MY_LIKE_BLOGS, blogLikeList);
+        Log.e("TheUtils", "In saveBlogLikePin, pinning list");
     }
 
+    /**
+     * Search the pinned list of liked blog objects.
+     * @return true if the current blog is in there.
+     */
+    public static boolean searchBlogLikeLocal() {
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("Blog"); ///CHECK
+        query.fromPin(MY_LIKE_BLOGS);
+        try {
+            List<ParseObject> list = query.find();
+            Log.d("TheUtils", "In searchBlogLikeLocal(), list size is " + list.size());
+            Log.d("TheUtils", "In searchBlogLikeLocal(), list is " + printList(list));
+            if (list.contains(myCurrentBlog)) { //TODO check if this works properly. How does contains work?
+                return true;
+            } else {
+                return false;
+            }
+        } catch (ParseException e) {
+            Log.e("TheUtils", "searchBlogLikeLocal, ParseException: " + e.getMessage());
+        }
+        Log.e("TheUtils", "searchBlogLikeLocal, returning false");
+        return false;
+    }
+
+    /**
+     * This method just returns a String which holds the list of titles of the blogs.
+     * Mainly used for testing purposes.
+     * @param list is a list of ParseObjects (parse object blogs)
+     * @return a String of blog titles.
+     */
+    private static String printList(List<ParseObject> list) {
+        String total = "";
+        for (int i = 0; i < list.size(); i++) {
+            total += " "  + list.get(i).get("Title") + ", ";
+        }
+        return total;
+    }
+
+    /**
+     * Loads liked blogs from device.
+     */
+    public static void loadBlogLikePinned() {
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("Blog"); ///CHECK
+        query.fromPin(MY_LIKE_BLOGS);
+        try {
+            List<ParseObject> list = query.find();
+            Log.d("TheUtils", "In loadBlogLikePinned(), list size is " + list.size());
+            Log.d("TheUtils", "In loadBlogLikePinned(), list is " + printList(list));
+            myParseLikeBlogs = list;
+            updateBlogLikeList();
+            saveBlogLikePin(list);
+            doneNotice(true);
+        } catch (ParseException e) {
+            doneNotice(false);
+            setBlogError(e.getMessage() + "");
+            Log.e("TheUtils", "loadhBlogLikePinned(), ParseException: " + e.getMessage());
+        }
+    }
 
     /**
      * Adds an object to the blogLike relation list.
@@ -310,10 +451,14 @@ public class TheUtils {
     public static boolean existsInBlogLikedList(Blog theBlog) {
         Log.d("TheUtils", "theBlog id: " + theBlog.getId());
         Log.d("TheUtils", myBlogLikedList + " existsInBlogLikeList? only if its not null");
+
         if (myBlogLikedList == null) {
-            loadLikedBlogs();
+            loadLikedBlogs2();
+            if (updateDone) {
+                doneNotice(false);
+            } //else error
         }
-        Log.d("TheUtils", myBlogLikedList + " existsInBlogLikeList? only if its not null");
+        Log.d("TheUtils", myBlogLikedList + " existsInBlogLikeList? only if its not null (2)");
         if (myBlogLikedList.contains(theBlog)) {
             return true;
         }
@@ -326,7 +471,7 @@ public class TheUtils {
     /**
      * Uses the list of ParseObject blogs to update a list of Blogs that the user likes.
      */
-    private static void updateBlogLikeList() {
+    private static void updateBlogLikeList() { //TODO check this
         myBlogLikedList = new ArrayList<>();
         for (ParseObject pObject : myParseLikeBlogs) {
             Blog aBlog = new Blog(pObject);
@@ -341,7 +486,8 @@ public class TheUtils {
      * @return the list that contains the stuff I like.
      */
     public static ArrayList<Blog> getBlogLikeList() {
-        return myBlogLikedList; //TODO maybe return a clone?
+        updateBlogLikeList();
+        return myBlogLikedList; //TODO maybe return a clone? no
     }
 
     /**
@@ -376,9 +522,102 @@ public class TheUtils {
      *                blog will be removed from the like lists (if boolean is false).
      */
     public static void updateVariousLikeBlogLists(boolean theBool) {
-        myBlogLikeRelations.add(myCurrentBlog.getBlog());
-        myParseLikeBlogs.add(myCurrentBlog.getBlog());
-        myBlogLikedList.add(myCurrentBlog);
+        if (theBool) {
+            Log.d("TheUtils", "In updateVariousLikeBlogLists, theBool is true");
+            int countZ2 = -999;
+            try {
+                countZ2 = myBlogLikeRelations.getQuery().count();
+            } catch (ParseException e) {
+                Log.d("TheUtils", "In updateVariousLikeBlogLists, error count1: " + e);
+            }
+            Log.d("TheUtils", "In updateVariousLikeBlogLists, relation size before adding: " + countZ2);
+
+            myBlogLikeRelations.add(myCurrentBlog.getBlog());
+
+
+            int countZ = -999;
+            try {
+                countZ = myBlogLikeRelations.getQuery().count();
+            } catch (ParseException e) {
+                Log.d("TheUtils", "In updateVariousLikeBlogLists, error count1: " + e);
+            }
+            Log.d("TheUtils", "In updateVariousLikeBlogLists, relation size after adding: " + countZ);
+            myBlogLikeRelations.remove(myCurrentBlog.getBlog());
+            int countZ3 = -999;
+            try {
+                countZ3 = myBlogLikeRelations.getQuery().count();
+            } catch (ParseException e) {
+                Log.d("TheUtils", "In updateVariousLikeBlogLists, error count2: " + e);
+            }
+            Log.d("TheUtils", "In updateVariousLikeBlogLists, after removal size of BlogLikeRelations :"
+                    + countZ3);
+
+
+
+            myParseLikeBlogs.add(myCurrentBlog.getBlog());
+            myBlogLikedList.add(myCurrentBlog);
+            saveBlogLikePin(myParseLikeBlogs);
+
+        } else {
+
+            int count1 = -999;
+            try {
+                count1 = myBlogLikeRelations.getQuery().count();
+            } catch (ParseException e) {
+                Log.d("TheUtils", "In updateVariousLikeBlogLists, error count1: " + e);
+            }
+            Log.d("TheUtils", "In updateVariousLikeBlogLists, before removal size of BlogLikeRelations :"
+                    + count1);
+
+
+            //first query the relation for the similar blog.
+            ParseObject relateObject = new ParseObject("Blog"); //must initialize this before overwritting it in next line.
+            try {
+                //myBlogLikeRelations.remove(myBlogLikeRelations.getQuery().get(myCurrentBlog.getBlog().getObjectId()));
+
+                //ParseUser.getCurrentUser().put("newRelationList", );
+                relateObject = myBlogLikeRelations.getQuery().get(myCurrentBlog.getId());
+                myBlogLikeRelations.remove(relateObject);
+                Log.d("TheUtils", "In updateVariousLikeBlogLists, relateObject " + relateObject.getObjectId());
+                Log.d("TheUtils", "In updateVariousLikeBlogLists, currentBlog: " + myCurrentBlog.getId());
+                Log.d("TheUtils", "In updateVariousLikeBlogLists, currentBlog: " + myCurrentBlog.getBlog().getObjectId());
+            } catch (ParseException e) {
+                Log.d("TheUtils", "In updateVariousLikeBlogLists, error in remove or get: " + e);
+            }
+            //myBlogLikeRelations.remove(relateObject);
+            int count2 = -999;
+            try {
+                count2 = myBlogLikeRelations.getQuery().count();
+//                ParseRelation<ParseObject> myBlogLikeRelations2
+//                myBlogLikeRelations2.add(myCurrentBlog.getBlog());
+//
+            } catch (ParseException e) {
+                Log.d("TheUtils", "In updateVariousLikeBlogLists, error count2: " + e);
+            }
+            Log.d("TheUtils", "In updateVariousLikeBlogLists, after removal size of BlogLikeRelations :"
+                    + count2);
+
+
+
+            Log.d("TheUtils", "In updateVariousLikeBlogLists, before removal size of parseLikeBlogs :" + myParseLikeBlogs.size());
+            myParseLikeBlogs.remove(myCurrentBlog.getBlog());
+            Log.d("TheUtils", "In updateVariousLikeBlogLists, after removal size of parseLikeBlogs :" + myParseLikeBlogs.size());
+            removeFromLikeList(myBlogLikedList); //TODO problem here, not removing
+            saveBlogLikePin(myParseLikeBlogs);
+        }
+    }
+
+    private static void removeFromLikeList(List<Blog> list) {
+        int position = -1;
+        for (int i = 0; i < list.size(); i++) {
+            if (list.get(i).getId().equals(myCurrentBlog.getId())) {
+                position = i;
+                break;
+            }
+        }
+        if (TheUtils.existsInBlogLikedList(TheUtils.getCurrentBlog())) {
+            list.remove(position);
+        }
     }
 
 
@@ -409,12 +648,12 @@ public class TheUtils {
 
 
 
-
     /**
      *
      * @return the list of foreign blogs
      */
     public static List<Blog> getForeignBlogList() {
+        //updateBlogLikeList();
         return foreignBlogList;
     }
 
