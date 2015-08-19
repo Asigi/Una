@@ -41,6 +41,7 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
         TheUtils.loadColorTheme(this);
         TheUtils.onActivityCreateSetTheme(this);
 
+        /*
         if (!TheUtils.FIRST_TIME_MAIN) {
 
             //TODO How about instead of loading all lists right at the beginning, create a boolean variable for whether each list
@@ -80,6 +81,8 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
 
             TheUtils.FIRST_TIME_MAIN = true;
         }
+
+ */
 
         //TODO try using saveEventually for users who arent in data network. Do this somewhere else.
 

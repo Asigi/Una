@@ -95,6 +95,7 @@ public class BlogWriterFragment extends Fragment {
             public void onClick(View v) {
                 String titleText = title.getText().toString();
                 String bodyText = body.getText().toString();
+                Log.d("BlogWriterFragment", titleText);
 
                 if (titleText.isEmpty() || bodyText.isEmpty()) {
                     AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());

@@ -42,7 +42,6 @@ public class ProfileFragment extends Fragment {
     public static final String SHOW_COLOR_OPTIONS = "show color options";
     public static final String SHOW_MY_BLOGS = "show my blogs";
     public static final String SHOW_MY_LIKED_BLOGS = "show the blogs that I like";
-    public static final String SHOW_FOREIGN_BLOGS = "show foreign blogs";
 
     public static final int TAKE_PHOTO_REQUEST = 0;
     public static final int CHOOSE_PHOTO_REQUEST = 1;
